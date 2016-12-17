@@ -16,6 +16,7 @@ using namespace yomob;
 #define  LOG_TAG    "TGSDK"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define  JTGSDKCocos2dxHelper "com/soulgame/sgsdk/tgsdklib/cocos2dx/TGSDKCocos2dxHelper"
+#define  JTGSDKClass "com/soulgame/sgsdk/tgsdklib/TGSDK"
 #endif
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
@@ -142,6 +143,54 @@ bool jsb_TGSDK_function_showAd(JSContext* cx, uint32_t argc, jsval* vp) {
     return false;
 }
 
+bool jsb_TGSDK_function_reportAdRejected(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.reportAdRejected called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string scene;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.reportAdRejected scene must be string");
+        TGSDKCocos2dxHelper::reportAdRejected(scene);
+        args.rval().set(JSVAL_NULL);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.reportAdRejected: Wrong number of arguments");
+    return false;
+}
+
+bool jsb_TGSDK_function_showAdScene(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.showAdScene called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string scene;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.showAdScene scene must be string");
+        TGSDKCocos2dxHelper::showAdScene(scene);
+        args.rval().set(JSVAL_NULL);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.showAdScene: Wrong number of arguments");
+    return false;
+}
+
+bool jsb_TGSDK_function_sendCounter(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.sendCounter called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (2 == argc) {
+        std::string name;
+        std::string metaData;
+        bool ok = jsval_to_std_string(cx, args.get(0), &name);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.sendCounter name must be string");
+        ok = jsval_to_std_string(cx, args.get(1), &metaData);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.sendCounter metaData must be string");
+        TGSDKCocos2dxHelper::sendCounter(name, metaData);
+        args.rval().set(JSVAL_NULL);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.sendCounter: Wrong number of arguments");
+    return false;
+}
+
 void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
     jsb_TGSDK_class = (JSClass*)calloc(1, sizeof(JSClass));
     jsb_TGSDK_class->name = JSTGSDKClass;
@@ -161,6 +210,9 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("preload", jsb_TGSDK_function_preload, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAd", jsb_TGSDK_function_showAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("reportAdRejected", jsb_TGSDK_function_reportAdRejected, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("showAdScene", jsb_TGSDK_function_showAdScene, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("sendCounter", jsb_TGSDK_function_sendCounter, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FS_END
     };
     
@@ -453,6 +505,83 @@ void TGSDKCocos2dxHelper::showAd(const std::string scene) {
     [TGSDK showAd:[NSString stringWithUTF8String:scene.c_str()]];
 #endif
 }
+
+void TGSDKCocos2dxHelper::reportAdRejected(const std::string scene) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 JTGSDKClass,
+                                                 "reportAdRejected",
+                                                 "(Ljava/lang/String;)V"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jscene);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDK jni reportAdRejected( scene ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK reportAdRejected:[NSString stringWithUTF8String:scene.c_str()]];
+#endif
+}
+
+void TGSDKCocos2dxHelper::showAdScene(const std::string scene) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 JTGSDKClass,
+                                                 "showAdScene",
+                                                 "(Ljava/lang/String;)V"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jscene);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDK jni showAdScene( scene ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK showAdScene:[NSString stringWithUTF8String:scene.c_str()]];
+#endif
+}
+
+void TGSDKCocos2dxHelper::sendCounter(const std::string name, const std::string metaData) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 JTGSDKCocos2dxHelper,
+                                                 "sendCounter",
+                                                 "(Ljava/lang/String;Ljava/lang/String;)V"
+    );
+    if (isHave) {
+        jstring jname = minfo.env->NewStringUTF(name.c_str());
+        jstring jmetadata = minfo.env->NewStringUTF(metaData.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jname,
+                                        jmetaData);
+        minfo.env->DeleteLocalRef(jname);
+        minfo.env->DeleteLocalRef(jmetaData);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni sendCounter( name, metaData ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK sendCounter:[NSString stringWithUTF8String:name.c_str()]
+           metaDataJson:[NSString stringWithUTF8String:metaData.c_str()]];
+#endif
+}
+
 
 void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string result) {
     cocos2d::EventCustom customEvent(event);

@@ -42,6 +42,11 @@ namespace yomob {
         
         static bool couldShowAd(const std::string scene);
         static void showAd(const std::string scene);
+
+        static void reportAdRejected(const std::string scene);
+        static void showAdScene(const std::string scene);
+
+        static void sendCounter(const std::string name, const std::string metaData);
         
         static void handleEvent(const std::string event, const std::string result);
         
