@@ -34,6 +34,9 @@ namespace yomob {
     public:
         static void setDebugModel(bool debug);
         
+        static void setSDKConfig(const std::string key, const std::string val);
+        static std::string getSDKConfig(const std::string key);
+        
         static void initialize(void);
         static void initialize(const std::string appid);
         static void initialize(const std::string appid, const std::string channelid);

@@ -76,6 +76,37 @@ bool jsb_TGSDK_function_setDebugModel(JSContext* cx, uint32_t argc, jsval *vp) {
     }
     JS_ReportError(cx, "JSB TGSDK.showAd: Wrong number of arguments");
     return false;
+}
+
+bool jsb_TGSDK_function_setSDKConfig(JSContext* cx, uint32_t argc, jsval *vp) {
+    LOGD("JSB TGSDK.setSDKConfig called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (2 == argc) {
+        std::string key;
+        std::string val;
+        bool ok = jsval_to_std_string(cx, args.get(0), &key);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setSDKConfig key must be string");
+        ok &= jsval_to_std_string(cx, args.get(1), &val);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setSDKConfig val must be string");
+        TGSDKCocos2dxHelper::setSDKConfig(key, val);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.setSDKConfig: Wrong number of arguments");
+    return false;
+}
+
+bool jsb_TGSDK_function_getSDKConfig(JSContext *cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.getSDKConfig called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string key;
+        bool ok = jsval_to_std_string(cx, args.get(0), &key);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.getSDKConfig key must be string");
+        std::string val = TGSDKCocos2dxHelper::getSDKConfig(key);
+        args.rval().set(std_string_to_jsval(cx, val));
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.getSDKConfig: Wrong number of arguments");
     return false;
 }
 
@@ -206,6 +237,8 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
     
     static JSFunctionSpec funcs[] = {
         JS_FN("setDebugModel", jsb_TGSDK_function_setDebugModel, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("setSDKConfig", jsb_TGSDK_function_setSDKConfig, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("getSDKConfig", jsb_TGSDK_function_getSDKConfig, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("initialize", jsb_TGSDK_function_initialize, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("preload", jsb_TGSDK_function_preload, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -297,6 +330,42 @@ static int tolua_TGSDK_function_setDebugModel(lua_State* tolua_S) {
         tolua_error(tolua_S,"#ferror in function 'TGSDK.setDebugModel'.",&tolua_err);
     }
     return 0;
+}
+
+static int tolua_TGSDK_function_setSDKConfig(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.setSDKConfig called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err) &&
+        tolua_isstring(tolua_S, 2, 0, &tolua_err)) {
+        std::string key;
+        std::string val;
+        bool ok = luaval_to_std_string(tolua_S, 1, &key);
+        ok &= luaval_to_std_string(tolua_S, 2, &val);
+        if (ok) {
+            TGSDKCocos2dxHelper::setSDKConfig(key, val);
+        }
+    } else {
+        LOGD("Lua TGSDK.setSDKConfig: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.setSDKConfig'.",&tolua_err);
+    }
+    return 0;
+}
+
+static int tolua_TGSDK_function_getSDKConfig(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.getSDKConfig called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tulua_err)) {
+        std::string key;
+        bool ok = luaval_to_std_string(tolua_S, 1, &key);
+        if (ok) {
+            std::string val = TGSDKCocos2dxHelper::getSDKConfig(key);
+            tolua_pushstring(tolua_S, val.c_str());
+        }
+    } else {
+        LOGD("Lua TGSDK.getSDKConfig: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.getSDKConfig'.",&tolua_err);
+    }
+    return 1;
 }
 
 static int tolua_TGSDK_function_initialize(lua_State* tolua_S) {
@@ -428,19 +497,21 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
       tolua_cclass(tolua_S,"TGSDK","cc.TGSDK","",NULL);
       #endif
       tolua_beginmodule(tolua_S,"TGSDK");
-        tolua_variable("TGSDK_EVENT_INIT_SUCCESS", tolua_TGSDK_EVENT_INIT_SUCCESS, nullptr),
-        tolua_variable("TGSDK_EVENT_INIT_FAILED", tolua_TGSDK_EVENT_INIT_FAILED, nullptr),
-        tolua_variable("TGSDK_EVENT_PRELOAD_SUCCESS", tolua_TGSDK_EVENT_PRELOAD_SUCCESS, nullptr),
-        tolua_variable("TGSDK_EVENT_PRELOAD_FAILED", tolua_TGSDK_EVENT_PRELOAD_FAILED, nullptr),
-        tolua_variable("TGSDK_EVENT_CPAD_LOADED", tolua_TGSDK_EVENT_CPAD_LOADED, nullptr),
-        tolua_variable("TGSDK_EVENT_VIDEOAD_LOADED", tolua_TGSDK_EVENT_VIDEOAD_LOADED, nullptr),
-        tolua_variable("TGSDK_EVENT_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_AD_SHOW_SUCCESS, nullptr),
-        tolua_variable("TGSDK_EVENT_AD_SHOW_FAILED", tolua_TGSDK_EVENT_AD_SHOW_FAILED, nullptr),
-        tolua_variable("TGSDK_EVENT_AD_COMPLETE", tolua_TGSDK_EVENT_AD_COMPLETE, nullptr),
-        tolua_variable("TGSDK_EVENT_AD_CLICK", tolua_TGSDK_EVENT_AD_CLICK, nullptr),
-        tolua_variable("TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr),
-        tolua_variable("TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr),
-        tolua_variable("TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr),
+        tolua_variable("TGSDK_EVENT_INIT_SUCCESS", tolua_TGSDK_EVENT_INIT_SUCCESS, nullptr);
+        tolua_variable("TGSDK_EVENT_INIT_FAILED", tolua_TGSDK_EVENT_INIT_FAILED, nullptr);
+        tolua_variable("TGSDK_EVENT_PRELOAD_SUCCESS", tolua_TGSDK_EVENT_PRELOAD_SUCCESS, nullptr);
+        tolua_variable("TGSDK_EVENT_PRELOAD_FAILED", tolua_TGSDK_EVENT_PRELOAD_FAILED, nullptr);
+        tolua_variable("TGSDK_EVENT_CPAD_LOADED", tolua_TGSDK_EVENT_CPAD_LOADED, nullptr);
+        tolua_variable("TGSDK_EVENT_VIDEOAD_LOADED", tolua_TGSDK_EVENT_VIDEOAD_LOADED, nullptr);
+        tolua_variable("TGSDK_EVENT_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_AD_SHOW_SUCCESS, nullptr);
+        tolua_variable("TGSDK_EVENT_AD_SHOW_FAILED", tolua_TGSDK_EVENT_AD_SHOW_FAILED, nullptr);
+        tolua_variable("TGSDK_EVENT_AD_COMPLETE", tolua_TGSDK_EVENT_AD_COMPLETE, nullptr);
+        tolua_variable("TGSDK_EVENT_AD_CLICK", tolua_TGSDK_EVENT_AD_CLICK, nullptr);
+        tolua_variable("TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
+        tolua_variable("TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
+        tolua_variable("TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
+        tolua_function(tolua_S, "setSDKConfig", tolua_TGSDK_function_setSDKConfig);
+        tolua_function(tolua_S, "getSDKConfig", tolua_TGSDK_function_getSDKConfig);
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
         tolua_function(tolua_S, "initialize", tolua_TGSDK_function_initialize);
         tolua_function(tolua_S, "preload", tolua_TGSDK_function_preload);
@@ -545,6 +616,61 @@ void TGSDKCocos2dxHelper::setDebugModel(bool debug) {
     }
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK setDebugModel:(debug?YES:NO)];
+#endif
+}
+
+void TGSDKCocos2dxHelper::setSDKConfig(const std::string key, const std::string val) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 JTGSDKClass,
+                                                 "setSDKConfig",
+                                                 "(Ljava/lang/String;Ljava/lang/String;)V");
+    if (isHave) {
+        jstring jkey = minfo.env->NewStringUTF(key.c_str());
+        jstring jval = minfo.env->NewStringUTF8(val.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jkey,
+                                        jval);
+        minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(jval);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDK jni setSDKConfig( key, val ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK setSDKConfig:[NSString stringWithUTF8String:val.c_str()]
+                 forKey:[NSString stringWithUTF8String:key.c_str()]];
+#endif
+}
+
+std::string TGSDKCocos2dxHelper::getSDKConfig(const std::string key) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethod(
+                                             JTGSDKClass,
+                                             "getSDKConfig",
+                                             "(Ljava/lang/String)Ljava/lang/String;"
+    );
+    if (isHave) {
+        jstring jkey = minfo.env->NewStringUTF(key.c_str());
+        std::string val = minfo.env->CallStaticStringMethod(
+                                                         minfo.classID,
+                                                         minfo.methodID,
+                                                         jkey
+        );
+        minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return val;
+    } else {
+        LOGD("TGSDK jni getSDKConfig( key ) not found");
+    }
+    return "";
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    NSString *val = [TGSDK getSDKConfig:[NSString stringWithUTF8String:key.c_str()]];
+    return (val?[val UTF8String]:"");
 #endif
 }
 
