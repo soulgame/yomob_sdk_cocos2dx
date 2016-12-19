@@ -223,6 +223,18 @@ bool jsb_TGSDK_function_sendCounter(JSContext* cx, uint32_t argc, jsval* vp) {
 }
 
 void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
+    JS::RootedObject yomob(cx);
+    JS::RootedValue yomobval(cx);
+    JS_GetProperty(cx, global, "yomob", &yomobval);
+    if (yomobval == JSVAL_VOID) {
+        yomob.set(JS_NewObject(cx, nullptr, JS::NullPtr(), JS::NullPtr()));
+        yomobval = OBJECT_TO_JSVAL(yomob);
+        JS_SetProperty(cx, global, "yomob", yomobval);
+    } else {
+        yomob.set(yomobval.toObjectOrNull());
+    }
+    
+    
     jsb_TGSDK_class = (JSClass*)calloc(1, sizeof(JSClass));
     jsb_TGSDK_class->name = JSTGSDKClass;
     jsb_TGSDK_class->addProperty = JS_PropertyStub;
@@ -266,7 +278,7 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_PS_END
     };
     
-    jsb_TGSDK_prototype = JS_InitClass(cx, global,
+    jsb_TGSDK_prototype = JS_InitClass(cx, yomob,
                                        JS::NullPtr(),
                                        jsb_TGSDK_class,
                                        jsb_TGSDK_constructor, 0,
@@ -923,6 +935,15 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
     customEvent.setUserData((void*) result.c_str());
     auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
     dispatcher->dispatchEvent(&customEvent);
+#ifdef TGSDK_BIND_JS
+    JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
+    jsval v[] = {
+        std_string_to_jsval(cx, result)
+    };
+    const char* cb = event.substr(6).c_str();
+    LOGD("TGSDK.%s called", cb);
+    ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb, 1, v);
+#endif
 }
 
 void TGSDKCocos2dxHelper::bindScript() {
