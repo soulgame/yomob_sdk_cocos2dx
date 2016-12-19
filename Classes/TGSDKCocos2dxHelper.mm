@@ -8,6 +8,7 @@
 
 #include "TGSDKCocos2dxHelper.h"
 
+USING_NS_CC;
 using namespace yomob;
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
@@ -613,6 +614,7 @@ void TGSDKCocos2dxHelper::setDebugModel(bool debug) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "setDebugModel",
                                                  "(Z)V"
@@ -620,7 +622,7 @@ void TGSDKCocos2dxHelper::setDebugModel(bool debug) {
     if (isHave) {
         minfo.env->CallStaticVoidMethod(
                                         minfo.classID,
-                                        minfo.methodID
+                                        minfo.methodID,
                                         debug);
         minfo.env->DeleteLocalRef(minfo.classID);
     } else {
@@ -635,12 +637,13 @@ void TGSDKCocos2dxHelper::setSDKConfig(const std::string key, const std::string 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKClass,
                                                  "setSDKConfig",
                                                  "(Ljava/lang/String;Ljava/lang/String;)V");
     if (isHave) {
         jstring jkey = minfo.env->NewStringUTF(key.c_str());
-        jstring jval = minfo.env->NewStringUTF8(val.c_str());
+        jstring jval = minfo.env->NewStringUTF(val.c_str());
         minfo.env->CallStaticVoidMethod(
                                         minfo.classID,
                                         minfo.methodID,
@@ -661,19 +664,22 @@ void TGSDKCocos2dxHelper::setSDKConfig(const std::string key, const std::string 
 std::string TGSDKCocos2dxHelper::getSDKConfig(const std::string key) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
-    bool isHave = JniHelper::getStaticMethod(
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                             minfo,
                                              JTGSDKClass,
                                              "getSDKConfig",
-                                             "(Ljava/lang/String)Ljava/lang/String;"
+                                             "(Ljava/lang/String;)Ljava/lang/String;"
     );
     if (isHave) {
         jstring jkey = minfo.env->NewStringUTF(key.c_str());
-        std::string val = minfo.env->CallStaticStringMethod(
+        jstring jval = (jstring)minfo.env->CallStaticObjectMethod(
                                                          minfo.classID,
                                                          minfo.methodID,
                                                          jkey
         );
+        std::string val = JniHelper::jstring2string(jval);
         minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(jval);
         minfo.env->DeleteLocalRef(minfo.classID);
         return val;
     } else {
@@ -690,6 +696,7 @@ void TGSDKCocos2dxHelper::initialize() {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "initialize",
                                                  "(V)V"
@@ -718,6 +725,7 @@ void TGSDKCocos2dxHelper::initialize(const std::string appid) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "initialize",
                                                  "(Ljava/lang/String;)V");
@@ -748,12 +756,13 @@ void TGSDKCocos2dxHelper::initialize(const std::string appid, const std::string 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "initialize",
                                                  "(Ljava/lang/String;Ljava/lang/String;)V");
     if (isHave) {
         jstring jappid = minfo.env->NewStringUTF(appid.c_str());
-        jstring jchannelid = minfo.env->NewStringUTF8(channelid.c_str());
+        jstring jchannelid = minfo.env->NewStringUTF(channelid.c_str());
         minfo.env->CallStaticVoidMethod(
                                         minfo.classID,
                                         minfo.methodID,
@@ -782,9 +791,10 @@ void TGSDKCocos2dxHelper::preload() {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "preload",
-                                                 "(V)V"
+                                                 "()V"
     );
     if (isHave) {
         minfo.env->CallStaticVoidMethod(
@@ -806,6 +816,7 @@ bool TGSDKCocos2dxHelper::couldShowAd(const std::string scene) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "couldShowAd",
                                                  "(Ljava/lang/String;)Z"
@@ -818,7 +829,7 @@ bool TGSDKCocos2dxHelper::couldShowAd(const std::string scene) {
                                                            jscene);
         minfo.env->DeleteLocalRef(jscene);
         minfo.env->DeleteLocalRef(minfo.classID);
-        return (jboolean?true:false);
+        return (jret?true:false);
     } else {
         LOGD("TGSDKCocos2dxHelper jni couldShowAd( scene ) not found");
     }
@@ -833,6 +844,7 @@ void TGSDKCocos2dxHelper::showAd(const std::string scene) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "showAd",
                                                  "(Ljava/lang/String;)V"
@@ -857,6 +869,7 @@ void TGSDKCocos2dxHelper::reportAdRejected(const std::string scene) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKClass,
                                                  "reportAdRejected",
                                                  "(Ljava/lang/String;)V"
@@ -881,6 +894,7 @@ void TGSDKCocos2dxHelper::showAdScene(const std::string scene) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKClass,
                                                  "showAdScene",
                                                  "(Ljava/lang/String;)V"
@@ -905,6 +919,7 @@ void TGSDKCocos2dxHelper::sendCounter(const std::string name, const std::string 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
     bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
                                                  JTGSDKCocos2dxHelper,
                                                  "sendCounter",
                                                  "(Ljava/lang/String;Ljava/lang/String;)V"
@@ -916,9 +931,9 @@ void TGSDKCocos2dxHelper::sendCounter(const std::string name, const std::string 
                                         minfo.classID,
                                         minfo.methodID,
                                         jname,
-                                        jmetaData);
+                                        jmetadata);
         minfo.env->DeleteLocalRef(jname);
-        minfo.env->DeleteLocalRef(jmetaData);
+        minfo.env->DeleteLocalRef(jmetadata);
         minfo.env->DeleteLocalRef(minfo.classID);
     } else {
         LOGD("TGSDKCocos2dxHelper jni sendCounter( name, metaData ) not found");
@@ -936,13 +951,13 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
     auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
     dispatcher->dispatchEvent(&customEvent);
 #ifdef TGSDK_BIND_JS
-    JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
-    jsval v[] = {
-        std_string_to_jsval(cx, result)
-    };
-    const char* cb = event.substr(6).c_str();
-    LOGD("TGSDK.%s called", cb);
-    ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb, 1, v);
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
+        JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
+        jsval v[] = { std_string_to_jsval(cx, result) };
+        const char* cb = (event).substr(6).c_str();
+        LOGD("Event listener TGSDK.%s called", cb);
+        ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb, 1, v);
+    });
 #endif
 }
 
