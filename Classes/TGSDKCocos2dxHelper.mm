@@ -306,7 +306,7 @@ extern "C" {
 
 #define LUA_TGSDK_EVENT_GETTER(evt) \
 static int tolua_##evt(lua_State* tolua_S) {\
-    lua_pushstring(evt);\
+    lua_pushstring(tolua_S, evt);\
     return 1;\
 }
 
@@ -332,6 +332,27 @@ static int tolua_collect_TGSDK (lua_State* tolua_S) {
 }
 #endif
 
+bool __luaval_to_std_string(lua_State* L, int lo, std::string* outValue, const char* funcName)
+{
+    if (NULL == L || NULL == outValue)
+        return false;
+    
+    bool ok = true;
+    
+    tolua_Error tolua_err;
+    if (!tolua_iscppstring(L,lo,0,&tolua_err))
+    {
+        ok = false;
+    }
+    
+    if (ok)
+    {
+        *outValue = tolua_tocppstring(L,lo,NULL);
+    }
+    
+    return ok;
+}
+
 static int tolua_TGSDK_function_setDebugModel(lua_State* tolua_S) {
     LOGD("Lua TGSDK.setDebugModel called");
     tolua_Error tolua_err;
@@ -352,8 +373,8 @@ static int tolua_TGSDK_function_setSDKConfig(lua_State* tolua_S) {
         tolua_isstring(tolua_S, 2, 0, &tolua_err)) {
         std::string key;
         std::string val;
-        bool ok = luaval_to_std_string(tolua_S, 1, &key);
-        ok &= luaval_to_std_string(tolua_S, 2, &val);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &key, "setSDKConfig");
+        ok &= __luaval_to_std_string(tolua_S, 2, &val, "setSDKConfig");
         if (ok) {
             TGSDKCocos2dxHelper::setSDKConfig(key, val);
         }
@@ -367,9 +388,9 @@ static int tolua_TGSDK_function_setSDKConfig(lua_State* tolua_S) {
 static int tolua_TGSDK_function_getSDKConfig(lua_State* tolua_S) {
     LOGD("Lua TGSDK.getSDKConfig called");
     tolua_Error tolua_err;
-    if (tolua_isstring(tolua_S, 1, 0, &tulua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
         std::string key;
-        bool ok = luaval_to_std_string(tolua_S, 1, &key);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &key, "getSDKConfig");
         if (ok) {
             std::string val = TGSDKCocos2dxHelper::getSDKConfig(key);
             tolua_pushstring(tolua_S, val.c_str());
@@ -386,18 +407,19 @@ static int tolua_TGSDK_function_initialize(lua_State* tolua_S) {
     tolua_Error tolua_err;
     bool hasArgv1 = tolua_isstring(tolua_S, 1, 0, &tolua_err);
     bool hasArgv2 = tolua_isstring(tolua_S, 2, 0, &tolua_err);
-    if (hasArg1 && hasArg2) {
+    if (hasArgv1 && hasArgv2) {
         std::string appid;
         std::string channelid;
-        bool ok = luaval_to_std_string(tolua_S, 1, &appid);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &appid, "initialize");
         if (!ok) {
         }
-        ok = luaval_to_std_string(tolua_S, 2, &channelid);
+        ok = __luaval_to_std_string(tolua_S, 2, &channelid, "initialize");
         if (!ok) {
         }
         TGSDKCocos2dxHelper::initialize(appid, channelid);
-    } else if (hasArg1) {
-        bool ok = luaval_to_std_string(tolua_S, 1, &appid);
+    } else if (hasArgv1) {
+        std::string appid;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &appid, "initialize");
         if (!ok) {
         }
         TGSDKCocos2dxHelper::initialize(appid);
@@ -418,11 +440,11 @@ static int tolua_TGSDK_function_couldShowAd(lua_State* tolua_S) {
     LOGD("Lua TGSDK.couldShowAd called");
     tolua_Error tolua_err;
     bool ret = false;
-    if (tolua_isstring(tolua_S, 1, &tolua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
         std::string scene;
-        ret = luaval_to_std_string(tolua_S, 1, &scene);
+        ret = __luaval_to_std_string(tolua_S, 1, &scene, "couldShowAd");
         if (ret) {
-            ret = TGSDKCocos2dxHeper::couldShowAd(scene);
+            ret = TGSDKCocos2dxHelper::couldShowAd(scene);
         }
     } else {
         LOGD("Lua TGSDK.couldShowAd: Wrong number of arguments");
@@ -435,11 +457,11 @@ static int tolua_TGSDK_function_couldShowAd(lua_State* tolua_S) {
 static int tolua_TGSDK_function_showAd(lua_State* tolua_S) {
     LOGD("Lua TGSDK.showAd called");
     tolua_Error tolua_err;
-    if (tolua_isstring(tolua_S, 1, &tolua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
         std::string scene;
-        bool ok = luaval_to_std_string(tolua_S, 1, &scene);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "showAd");
         if (ok) {
-            TGSDKCocos2dxHeper::showAd(scene);
+            TGSDKCocos2dxHelper::showAd(scene);
         }
     } else {
         LOGD("Lua TGSDK.showAd: Wrong number of arguments");
@@ -451,11 +473,11 @@ static int tolua_TGSDK_function_showAd(lua_State* tolua_S) {
 static int tolua_TGSDK_function_reportAdRejected(lua_State* tolua_S) {
     LOGD("Lua TGSDK.reportAdRejected called");
     tolua_Error tolua_err;
-    if (tolua_isstring(tolua_S, 1, &tolua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
         std::string scene;
-        bool ok = luaval_to_std_string(tolua_S, 1, &scene);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "reportAdRejected");
         if (ok) {
-            TGSDKCocos2dxHeper::reportAdRejected(scene);
+            TGSDKCocos2dxHelper::reportAdRejected(scene);
         }
     } else {
         LOGD("Lua TGSDK.reportAdRejected: Wrong number of arguments");
@@ -467,11 +489,11 @@ static int tolua_TGSDK_function_reportAdRejected(lua_State* tolua_S) {
 static int tolua_TGSDK_function_showAdScene(lua_State* tolua_S) {
     LOGD("Lua TGSDK.showAdScene called");
     tolua_Error tolua_err;
-    if (tolua_isstring(tolua_S, 1, &tolua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
         std::string scene;
-        bool ok = luaval_to_std_string(tolua_S, 1, &scene);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "showAdScene");
         if (ok) {
-            TGSDKCocos2dxHeper::showAdScene(scene);
+            TGSDKCocos2dxHelper::showAdScene(scene);
         }
     } else {
         LOGD("Lua TGSDK.showAdScene: Wrong number of arguments");
@@ -483,14 +505,14 @@ static int tolua_TGSDK_function_showAdScene(lua_State* tolua_S) {
 static int tolua_TGSDK_function_sendCounter(lua_State* tolua_S) {
     LOGD("Lua TGSDK.sendCounter called");
     tolua_Error tolua_err;
-    if (tolua_isstring(tolua_S, 1, &tolua_err) &&
-        tolua_isstring(tolua_S, 2, &tolua_err)) {
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err) &&
+        tolua_isstring(tolua_S, 2, 0, &tolua_err)) {
         std::string name;
         std::string metaData;
-        bool ok = luaval_to_std_string(tolua_S, 1, &name);
-        ok &= luaval_to_std_string(tolua_S, 2, &metaData);
+        bool ok = __luaval_to_std_string(tolua_S, 1, &name, "sendCounter");
+        ok &= __luaval_to_std_string(tolua_S, 2, &metaData, "sendCounter");
         if (ok) {
-            TGSDKCocos2dxHeper::sendCounter(name, metaData);
+            TGSDKCocos2dxHelper::sendCounter(name, metaData);
         }
     } else {
         LOGD("Lua TGSDK.sendCounter: Wrong number of arguments");
@@ -505,24 +527,24 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
     tolua_module(tolua_S,"yomob",0);
     tolua_beginmodule(tolua_S,"yomob");
       #ifdef __cplusplus
-      tolua_cclass(tolua_S,"TGSDK","cc.TGSDK","",tolua_collect_TGSDK);
+      tolua_cclass(tolua_S,"TGSDK","yomob.TGSDK","",tolua_collect_TGSDK);
       #else
-      tolua_cclass(tolua_S,"TGSDK","cc.TGSDK","",NULL);
+      tolua_cclass(tolua_S,"TGSDK","yomob.TGSDK","",NULL);
       #endif
       tolua_beginmodule(tolua_S,"TGSDK");
-        tolua_variable("TGSDK_EVENT_INIT_SUCCESS", tolua_TGSDK_EVENT_INIT_SUCCESS, nullptr);
-        tolua_variable("TGSDK_EVENT_INIT_FAILED", tolua_TGSDK_EVENT_INIT_FAILED, nullptr);
-        tolua_variable("TGSDK_EVENT_PRELOAD_SUCCESS", tolua_TGSDK_EVENT_PRELOAD_SUCCESS, nullptr);
-        tolua_variable("TGSDK_EVENT_PRELOAD_FAILED", tolua_TGSDK_EVENT_PRELOAD_FAILED, nullptr);
-        tolua_variable("TGSDK_EVENT_CPAD_LOADED", tolua_TGSDK_EVENT_CPAD_LOADED, nullptr);
-        tolua_variable("TGSDK_EVENT_VIDEOAD_LOADED", tolua_TGSDK_EVENT_VIDEOAD_LOADED, nullptr);
-        tolua_variable("TGSDK_EVENT_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_AD_SHOW_SUCCESS, nullptr);
-        tolua_variable("TGSDK_EVENT_AD_SHOW_FAILED", tolua_TGSDK_EVENT_AD_SHOW_FAILED, nullptr);
-        tolua_variable("TGSDK_EVENT_AD_COMPLETE", tolua_TGSDK_EVENT_AD_COMPLETE, nullptr);
-        tolua_variable("TGSDK_EVENT_AD_CLICK", tolua_TGSDK_EVENT_AD_CLICK, nullptr);
-        tolua_variable("TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
-        tolua_variable("TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
-        tolua_variable("TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_INIT_SUCCESS", tolua_TGSDK_EVENT_INIT_SUCCESS, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_INIT_FAILED", tolua_TGSDK_EVENT_INIT_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_PRELOAD_SUCCESS", tolua_TGSDK_EVENT_PRELOAD_SUCCESS, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_PRELOAD_FAILED", tolua_TGSDK_EVENT_PRELOAD_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_CPAD_LOADED", tolua_TGSDK_EVENT_CPAD_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_VIDEOAD_LOADED", tolua_TGSDK_EVENT_VIDEOAD_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_AD_SHOW_SUCCESS, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_AD_SHOW_FAILED", tolua_TGSDK_EVENT_AD_SHOW_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_AD_COMPLETE", tolua_TGSDK_EVENT_AD_COMPLETE, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLICK", tolua_TGSDK_EVENT_AD_CLICK, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
         tolua_function(tolua_S, "setSDKConfig", tolua_TGSDK_function_setSDKConfig);
         tolua_function(tolua_S, "getSDKConfig", tolua_TGSDK_function_getSDKConfig);
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
