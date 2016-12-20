@@ -277,6 +277,89 @@ yomob.TGSDK.TGSDK_EVENT_REWARD_FAILED
 
 如果不想使用 `CustomEvent` 的方式来处理回调事件的话，我们还支持回调方法
 
+C++
+```
+EventListenerCustom* sdkListener = NULL;
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_INIT_SUCCESS, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK init Success : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_INIT_FAILED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK init Failed : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_PRELOAD_SUCCESS, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK preload Success : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_PRELOAD_FAILED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK preload Failed : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_CPAD_LOADED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK CPAD loaded : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_VIDEOAD_LOADED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK VideoAD loaded : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_AD_SHOW_SUCCESS, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK AD Show Success : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_AD_SHOW_FAILED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK AD Show Failed : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_AD_CLICK, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK AD Click : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_AD_CLOSE, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK AD Close : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_AD_COMPLETE, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK AD Complete : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_REWARD_SUCCESS, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Reward Success : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_REWARD_FAILED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Reward Failed : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+```
+
 JavaScript
 ```
 yomob.TGSDK.prototype.onInitSuccess = function(ret) {
