@@ -96,6 +96,26 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 ##4、如何使用
 
+###Debug 模式开关
+
+C++
+```
+yomob::TGSDKCocos2dxHelper::setDebugModel(true);
+```
+
+JavaScript
+```
+yomob.TGSDK.setDebugModel(true);
+```
+
+Lua
+```
+yomob.TGSDK.setDebugModel(true)
+```
+
+
+>**【注意】release 环境正式发布产品时记得关闭 Debug 模式**
+
 ###初始化 TGSDK
 
 C++
