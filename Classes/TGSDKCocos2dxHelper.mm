@@ -981,6 +981,23 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb, 1, v);
     });
 #endif
+#ifdef TGSDK_BIND_LUA
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
+        const char* cb = (event).substr(6).c_str();
+        LOGD("Event listener TGSDK.%s called", cb);
+        auto engine = LuaEngine::getInstance();
+        lua_State* L = engine->getLuaStack()->getLuaState();
+        lua_getglobal(L, "yomob");
+        lua_getfield(L, -1, "TGSDK");
+        lua_getfield(L, -1, cb);
+        lua_pushstring(L, result.c_str());
+        int error = lua_pcall(L, 1, 0, 0);
+        if (error) {
+            LOGD("Lua TGSDK.%s Error: %s", cb, lua_tostring(L, -1));
+            lua_pop(L, 1);
+        }
+    });
+#endif
 }
 
 void TGSDKCocos2dxHelper::bindScript() {
