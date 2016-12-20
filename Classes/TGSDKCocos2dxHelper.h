@@ -2,7 +2,7 @@
 //  TGSDKCocos2dxHelper.h
 //  tgsdk_cocos_js
 //
-//  Created by 李寅 on 2016/12/15.
+//  Created by yomob on 2016/12/15.
 //
 //
 
