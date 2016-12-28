@@ -18,6 +18,22 @@ using namespace yomob;
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define  JTGSDKCocos2dxHelper "com/soulgame/sgsdk/tgsdklib/cocos2dx/TGSDKCocos2dxHelper"
 #define  JTGSDKClass "com/soulgame/sgsdk/tgsdklib/TGSDK"
+
+// getStringUTFCharsJNI not exists in cocos/base/ccUTF8.h on some old version cocos2d-x engine
+std::string __tgsdk_jstring_to_stdstring(JNIEnv* env, jstring srcjStr) {
+    std::string utf8Str;
+    const unsigned short * unicodeChar = ( const unsigned short *)env->GetStringChars(srcjStr, nullptr);
+    size_t unicodeCharLength = env->GetStringLength(srcjStr);
+    const std::u16string unicodeStr((const char16_t *)unicodeChar, unicodeCharLength);
+    bool flag = cocos2d::StringUtils::UTF16ToUTF8(unicodeStr, utf8Str);
+
+    if (!flag) {
+        utf8Str = "";
+    }
+    env->ReleaseStringChars(srcjStr, unicodeChar);
+    return utf8Str;
+}
+
 #endif
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
@@ -566,8 +582,8 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 extern "C" {
     void Java_com_soulgame_sgsdk_tgsdklib_cocos2dx_TGSDKCocos2dxHelper_onEvent(JNIEnv *env, jobject thiz, jstring jevent, jstring jresult) {
-        std::string event = cocos2d::StringUtils::getStringUTFCharsJNI(env, jevent);
-        std::string result = cocos2d::StringUtils::getStringUTFCharsJNI(env, jresult);
+        std::string event = __tgsdk_jstring_to_stdstring(env, jevent);
+        std::string result = __tgsdk_jstring_to_stdstring(env, jresult);
         TGSDKCocos2dxHelper::handleEvent(event, result);
     }
 }

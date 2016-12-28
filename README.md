@@ -80,6 +80,8 @@ public class AppActivity extends Cocos2dxActivity{
 }
 ```
 
+>**【注意】1.4.3（含）之前的版本需要手动加入上述 Java 源代码文件，之后的版本不需要手动加入 Java 源文件，但是都必须调用上述的 `setup` 方法！！！**
+
 ##3、脚本绑定
 
 如果你使用了 `JavaScript` 或者 `Lua` 脚本，那么你需要执行脚本绑定方法将 `TGSDK` 对象绑定到脚本运行环境去，具体的做法是在 `AppDelegate.cpp` 文件的 `bool AppDelegate::applicationDidFinishLaunching()` 方法中加入
@@ -93,6 +95,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // Other code ......
 }
 ```
+
+>**【注意】脚本绑定方法一定要在任何脚本文件执行之前调用完成！**
 
 ##4、如何使用
 
