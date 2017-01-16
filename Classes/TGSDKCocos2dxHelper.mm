@@ -11,6 +11,8 @@
 USING_NS_CC;
 using namespace yomob;
 
+#define  TGSDK_NONE  "__tgsdk__none__"
+
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #include "platform/android/jni/JniHelper.h"
 #include <android/log.h>
@@ -161,6 +163,33 @@ bool jsb_TGSDK_function_preload(JSContext* cx, uint32_t argc, jsval* vp) {
     return true;
 }
 
+bool jsb_TGSDK_function_parameterFromAdScene(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.parameterFromAdScene called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (argc >= 2) {
+        std::string scene;
+        std::string key;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.parameterFromAdScene scene must be string");
+        ok = jsval_to_std_string(cx, args.get(1), &key);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.parameterFromAdScene key must be string");
+        std::string ret = TGSDKCocos2dxHelper::getStringParameterFromAdScene(scene, key, TGSDK_NONE);
+        if (ret.compare(TGSDK_NONE) == 0) {
+            if (argc > 2) {
+                args.rval().set(args.get(2));
+            } else {
+                args.rval().set(JSVAL_NULL);
+            }
+        } else {
+            args.rval().set(std_string_to_jsval(cx, ret));
+        }
+    } else {
+        JS_ReportError(cx, "JSB TGSDK.parameterFromAdScene: Wrong number of arguments");
+        return false;
+    }
+    return true;
+}
+
 bool jsb_TGSDK_function_couldShowAd(JSContext* cx, uint32_t argc, jsval* vp) {
     LOGD("JSB TGSDK.couldShowAd called");
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -270,6 +299,7 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("getSDKConfig", jsb_TGSDK_function_getSDKConfig, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("initialize", jsb_TGSDK_function_initialize, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("preload", jsb_TGSDK_function_preload, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("parameterFromAdScene", jsb_TGSDK_function_parameterFromAdScene, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAd", jsb_TGSDK_function_showAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("reportAdRejected", jsb_TGSDK_function_reportAdRejected, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -410,10 +440,42 @@ static int tolua_TGSDK_function_getSDKConfig(lua_State* tolua_S) {
         if (ok) {
             std::string val = TGSDKCocos2dxHelper::getSDKConfig(key);
             tolua_pushstring(tolua_S, val.c_str());
+        } else {
+            lua_pushnil(tolua_S);
         }
     } else {
         LOGD("Lua TGSDK.getSDKConfig: Wrong number of arguments");
         tolua_error(tolua_S,"#ferror in function 'TGSDK.getSDKConfig'.",&tolua_err);
+        lua_pushnil(tolua_S);
+    }
+    return 1;
+}
+
+static int tolua_TGSDK_function_parameterFromAdScene(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.parameterFromAdScene called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)
+        &&  tolua_isstring(tolua_S, 2, 0, &tolua_err)) {
+        std::string scene;
+        std::string key;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "parameterFromAdScene");
+        ok &= __luaval_to_std_string(tolua_S, 2, &key, "parameterFromAdScene");
+        if (ok) {
+            std::string ret = TGSDKCocos2dxHelper::getStringParameterFromAdScene(scene, key, TGSDK_NONE);
+            if (ret.compare(TGSDK_NONE) == 0) {
+                if (lua_gettop(tolua_S) > 2) {
+                    lua_pushvalue(tolua_S, 3);
+                } else {
+                    lua_pushnil(tolua_S);
+                }
+            } else {
+                tolua_pushstring(tolua_S, ret.c_str());
+            }
+        }
+    } else {
+        LOGD("Lua TGSDK.parameterFromAdScene: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.parameterFromAdScene'.",&tolua_err);
+        lua_pushnil(tolua_S);
     }
     return 1;
 }
@@ -566,6 +628,7 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
         tolua_function(tolua_S, "initialize", tolua_TGSDK_function_initialize);
         tolua_function(tolua_S, "preload", tolua_TGSDK_function_preload);
+        tolua_function(tolua_S, "parameterFromAdScene", tolua_TGSDK_function_parameterFromAdScene);
         tolua_function(tolua_S, "couldShowAd", tolua_TGSDK_function_couldShowAd);
         tolua_function(tolua_S, "showAd", tolua_TGSDK_function_showAd);
         tolua_function(tolua_S, "reportAdRejected", tolua_TGSDK_function_reportAdRejected);
@@ -847,6 +910,122 @@ void TGSDKCocos2dxHelper::preload() {
     [TGSDK setADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK setRewardVideoADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK preloadAd:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
+#endif
+}
+
+int TGSDKCocos2dxHelper::getIntParameterFromAdScene(const std::string scene, const std::string key, int def) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKCocos2dxHelper,
+                                                 "getIntParameterFromAdScene",
+                                                 "(Ljava/lang/String;Ljava/lang/String;I)I"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        jstring jkey = minfo.env->NewStringUTF(key.c_str());
+        jint jret = minfo.env->CallStaticIntMethod(
+                                                           minfo.classID,
+                                                           minfo.methodID,
+                                                           jscene,
+                                                           jkey,
+                                                           (jint)def);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return (int)jret;
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni getIntParameterFromAdScene() not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    id ret = [TGSDK parameterFromAdScene:[NSString stringWithUTF8String:scene.c_str()]
+                                 WithKey:[NSString stringWithUTF8String:key.c_str()]];
+    if (ret && [ret isKindOfClass:[NSNumber class]]) {
+        return [ret intValue];
+    }
+    LOGD("Get parameter from AD scene error : %s %s", key.c_str(), (ret?"is not number":"not found"));
+    return def;
+#endif
+}
+
+float TGSDKCocos2dxHelper::getFloatParameterFromAdScene(const std::string scene, const std::string key, float def) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKCocos2dxHelper,
+                                                 "getFloatParameterFromAdScene",
+                                                 "(Ljava/lang/String;Ljava/lang/String;F)F"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        jstring jkey = minfo.env->NewStringUTF(key.c_str());
+        jfloat jret = minfo.env->CallStaticFloatMethod(
+                                                           minfo.classID,
+                                                           minfo.methodID,
+                                                           jscene,
+                                                           jkey,
+                                                           (jfloat)def);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return (float)jret;
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni getIntParameterFromAdScene() not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    id ret = [TGSDK parameterFromAdScene:[NSString stringWithUTF8String:scene.c_str()]
+                                 WithKey:[NSString stringWithUTF8String:key.c_str()]];
+    if (ret && [ret isKindOfClass:[NSNumber class]]) {
+        return [ret floatValue];
+    }
+    LOGD("Get parameter from AD scene error : %s %s", key.c_str(), (ret?"is not number":"not found"));
+    return def;
+#endif
+}
+
+std::string TGSDKCocos2dxHelper::getStringParameterFromAdScene(const std::string scene, const std::string key, const std::string def) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                             minfo,
+                                             JTGSDKCocos2dxHelper,
+                                             "getStringParameterFromAdScene",
+                                             "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        jstring jkey = minfo.env->NewStringUTF(key.c_str());
+        jstring jdef = minfo.env->NewStringUTF(def.c_str());
+        jstring jval = (jstring)minfo.env->CallStaticObjectMethod(
+                                                         minfo.classID,
+                                                         minfo.methodID,
+                                                         jscene,
+                                                         jkey,
+                                                         jdef
+        );
+        std::string val = JniHelper::jstring2string(jval);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(jkey);
+        minfo.env->DeleteLocalRef(jdef);
+        minfo.env->DeleteLocalRef(jval);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return val;
+    } else {
+        LOGD("TGSDK jni getStringParameterFromAdScene( key ) not found");
+        return def;
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    id ret = [TGSDK parameterFromAdScene:[NSString stringWithUTF8String:scene.c_str()]
+                                 WithKey:[NSString stringWithUTF8String:key.c_str()]];
+    if (ret && [ret isKindOfClass:[NSString class]]) {
+        return ([ret UTF8String]);
+    }  else if (ret && [ret isKindOfClass:[NSNumber class]]) {
+        return ([[ret stringValue] UTF8String]);
+    }
+    LOGD("Get parameter from AD scene error : %s %s", key.c_str(), (ret?"is not string":"not found"));
+    return (char*)(def.c_str());
 #endif
 }
 

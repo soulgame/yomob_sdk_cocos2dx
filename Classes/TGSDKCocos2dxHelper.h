@@ -42,6 +42,10 @@ namespace yomob {
         static void initialize(const std::string appid, const std::string channelid);
         
         static void preload();
+
+        static int getIntParameterFromAdScene(const std::string scene, const std::string key, int def = 0);
+        static float getFloatParameterFromAdScene(const std::string scene, const std::string key, float def = 0);
+        static std::string getStringParameterFromAdScene(const std::string scene, const std::string key, const std::string def = "");
         
         static bool couldShowAd(const std::string scene);
         static void showAd(const std::string scene);
