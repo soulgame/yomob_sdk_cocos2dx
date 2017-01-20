@@ -1,5 +1,7 @@
 #Yomob SDK for Cocos2d-x
 
+>**【注意】由于 `1.6.x` 版本新增了场景参数接口，如果使用 1.5.x 以前的版本 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.6.x 版本或是使用 Tag 为 `1.5.x` 的 Cocos2d-x 封装代码来兼容 1.5.x 以前的 TGSDK 接口实现**
+
 ##1、概述
 
 为了方便使用 cocos2d-x 引擎开发的产品使用 Yomob 的广告 SDK，我们给 Yomob 的广告 SDK 做了一层封装，并提供了更适合 cocos2d-x 使用的 API 以及 JavaScript 绑定和 Lua 绑定支持。
@@ -178,6 +180,30 @@ if yomob.TGSDK.couldShowAd("Scene ID") then
     yomob.TGSDK.showAd("Scene ID")
 end
 ```
+
+###场景参数
+
+什么是场景参数？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
+
+C++
+```
+std::string param1 = yomob::TGSDKCocos2dxHelper::getStringParameterFromAdScene("Your Scene id", "Your Key");
+
+int param2 = yomob::TGSDKCocos2dxHelper::getIntParameterFromAdScene("Your Scene id", "Your Key");
+
+float param3 = yomob::TGSDKCocos2dxHelper::getFloatParameterFromAdScene("Your Scene id", "Your Key");
+```
+
+JavaScript
+```
+var param = yomob.TGSDK.parameterFromAdScene("Your Scene id", "Your Key");
+```
+
+Lua
+```
+local param = yomob.TGSDK.parameterFromAdScene("Your Scene id", "Your Key")
+```
+
 
 ###用户广告行为追踪
 
