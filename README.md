@@ -1,6 +1,8 @@
 # Yomob SDK for Cocos2d-x
 
 >**【注意】由于 `1.6.x` 版本新增了场景参数接口，如果使用 1.5.x 以前的版本 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.6.x 版本或是使用 Tag 为 `1.5.x` 的 Cocos2d-x 封装代码来兼容 1.5.x 以前的 TGSDK 接口实现**
+>
+>**【注意】由于 `1.6.5` 版本新增了广告测试工具接口，如果你使用 1.6.5 版本以前的 TGSDK 接入会由于缺少新接口实现导致无法成功编译，请尽快升级你的 TGSDK 到最新版本或是使用 Tag 为 `1.6.4` 的 Cocos2d-x 封装代码来兼容**
 
 ## 1、概述
 
@@ -203,7 +205,24 @@ if yomob.TGSDK.couldShowAd("Scene ID") then
 end
 ```
 
-### 场景参数
+### 显示广告测试工具（1.6.5 以上）
+
+C++
+```
+yomob::TGSDKCocos2dxHelper::showTestView("Scene ID");
+```
+
+JavaScript
+```
+yomob.TGSDK.showTestView("Scene ID");
+```
+
+Lua
+```
+yomob.TGSDK.showTestView("Scene ID")
+```
+
+### 场景参数（1.6.0 以上）
 
 什么是场景参数？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
 

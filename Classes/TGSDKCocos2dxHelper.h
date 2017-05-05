@@ -51,6 +51,7 @@ namespace yomob {
         
         static bool couldShowAd(const std::string scene);
         static void showAd(const std::string scene);
+        static void showTestView(const std::string scene);
 
         static void reportAdRejected(const std::string scene);
         static void showAdScene(const std::string scene);

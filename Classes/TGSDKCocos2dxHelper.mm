@@ -228,6 +228,21 @@ bool jsb_TGSDK_function_showAd(JSContext* cx, uint32_t argc, jsval* vp) {
     return false;
 }
 
+bool jsb_TGSDK_function_showTestView(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.showTestView called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string scene;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.showTestView scene must be string");
+        TGSDKCocos2dxHelper::showTestView(scene);
+        args.rval().set(JSVAL_NULL);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.showTestView: Wrong number of arguments");
+    return false;
+}
+
 bool jsb_TGSDK_function_reportAdRejected(JSContext* cx, uint32_t argc, jsval* vp) {
     LOGD("JSB TGSDK.reportAdRejected called");
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -311,6 +326,7 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("parameterFromAdScene", jsb_TGSDK_function_parameterFromAdScene, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAd", jsb_TGSDK_function_showAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("showTestView", jsb_TGSDK_function_showTestView, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("reportAdRejected", jsb_TGSDK_function_reportAdRejected, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAdScene", jsb_TGSDK_function_showAdScene, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("sendCounter", jsb_TGSDK_function_sendCounter, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -564,6 +580,22 @@ static int tolua_TGSDK_function_showAd(lua_State* tolua_S) {
     return 0;
 }
 
+static int tolua_TGSDK_function_showTestView(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.showTestView called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
+        std::string scene;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "showTestView");
+        if (ok) {
+            TGSDKCocos2dxHelper::showTestView(scene);
+        }
+    } else {
+        LOGD("Lua TGSDK.showTestView: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.showTestView'.",&tolua_err);
+    }
+    return 0;
+}
+
 static int tolua_TGSDK_function_reportAdRejected(lua_State* tolua_S) {
     LOGD("Lua TGSDK.reportAdRejected called");
     tolua_Error tolua_err;
@@ -648,6 +680,7 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "parameterFromAdScene", tolua_TGSDK_function_parameterFromAdScene);
         tolua_function(tolua_S, "couldShowAd", tolua_TGSDK_function_couldShowAd);
         tolua_function(tolua_S, "showAd", tolua_TGSDK_function_showAd);
+        tolua_function(tolua_S, "showTestView", tolua_TGSDK_function_showTestView);
         tolua_function(tolua_S, "reportAdRejected", tolua_TGSDK_function_reportAdRejected);
         tolua_function(tolua_S, "showAdScene", tolua_TGSDK_function_showAdScene);
         tolua_function(tolua_S, "sendCounter", tolua_TGSDK_function_sendCounter);
@@ -1121,6 +1154,31 @@ void TGSDKCocos2dxHelper::showAd(const std::string scene) {
     }
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK showAd:[NSString stringWithUTF8String:scene.c_str()]];
+#endif
+}
+
+void TGSDKCocos2dxHelper::showTestView(const std::string scene) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKCocos2dxHelper,
+                                                 "showTestView",
+                                                 "(Ljava/lang/String;)V"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jscene);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni showTestView( scene ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK showTestView:[NSString stringWithUTF8String:scene.c_str()]];
 #endif
 }
 
