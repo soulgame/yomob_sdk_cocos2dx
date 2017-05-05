@@ -41,6 +41,8 @@ namespace yomob {
         static void initialize(const std::string appid);
         static void initialize(const std::string appid, const std::string channelid);
         
+        static int isWIFI();
+
         static void preload();
 
         static int getIntParameterFromAdScene(const std::string scene, const std::string key, int def = 0);

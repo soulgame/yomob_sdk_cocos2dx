@@ -155,6 +155,14 @@ bool jsb_TGSDK_function_initialize(JSContext* cx, uint32_t argc, jsval* vp) {
     return true;
 }
 
+bool jsb_TGSDK_function_isWIFI(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.isWIFI called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    int ret = TGSDKCocos2dxHelper::isWIFI();
+    args.rval().set(INT_TO_JSVAL(ret));
+    return true;
+}
+
 bool jsb_TGSDK_function_preload(JSContext* cx, uint32_t argc, jsval* vp) {
     LOGD("JSB TGSDK.preload called");
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -298,6 +306,7 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("setSDKConfig", jsb_TGSDK_function_setSDKConfig, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("getSDKConfig", jsb_TGSDK_function_getSDKConfig, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("initialize", jsb_TGSDK_function_initialize, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("isWIFI", jsb_TGSDK_function_isWIFI, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("preload", jsb_TGSDK_function_preload, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("parameterFromAdScene", jsb_TGSDK_function_parameterFromAdScene, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -507,6 +516,13 @@ static int tolua_TGSDK_function_initialize(lua_State* tolua_S) {
     return 0;
 }
 
+static int tolua_TGSDK_function_isWIFI(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.isWIFI called");
+    int ret = TGSDKCocos2dxHelper::isWIFI();
+    tolua_pushnumber(tolua_S, (double)ret);
+    return 1;
+}
+
 static int tolua_TGSDK_function_preload(lua_State* tolua_S) {
     LOGD("Lua TGSDK.preload called");
     // tolua_Error tolua_err;
@@ -627,6 +643,7 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "getSDKConfig", tolua_TGSDK_function_getSDKConfig);
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
         tolua_function(tolua_S, "initialize", tolua_TGSDK_function_initialize);
+        tolua_function(tolua_S, "isWIFI", tolua_TGSDK_function_isWIFI);
         tolua_function(tolua_S, "preload", tolua_TGSDK_function_preload);
         tolua_function(tolua_S, "parameterFromAdScene", tolua_TGSDK_function_parameterFromAdScene);
         tolua_function(tolua_S, "couldShowAd", tolua_TGSDK_function_couldShowAd);
@@ -886,6 +903,31 @@ void TGSDKCocos2dxHelper::initialize(const std::string appid, const std::string 
                  }
              }];
 #endif
+}
+
+int TGSDKCocos2dxHelper::isWIFI() {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKClass,
+                                                 "isWIFI",
+                                                 "()I"
+    );
+    if (isHave) {
+        jint jret = minfo.env->CallStaticIntMethod(
+                                        minfo.classID,
+                                        minfo.methodID
+        );
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return (int)jret;
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni isWIFI() not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    return [TGSDK isWIFI];
+#endif
+    return 2;
 }
 
 void TGSDKCocos2dxHelper::preload() {

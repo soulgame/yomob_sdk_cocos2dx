@@ -1,12 +1,12 @@
-#Yomob SDK for Cocos2d-x
+# Yomob SDK for Cocos2d-x
 
 >**【注意】由于 `1.6.x` 版本新增了场景参数接口，如果使用 1.5.x 以前的版本 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.6.x 版本或是使用 Tag 为 `1.5.x` 的 Cocos2d-x 封装代码来兼容 1.5.x 以前的 TGSDK 接口实现**
 
-##1、概述
+## 1、概述
 
 为了方便使用 cocos2d-x 引擎开发的产品使用 Yomob 的广告 SDK，我们给 Yomob 的广告 SDK 做了一层封装，并提供了更适合 cocos2d-x 使用的 API 以及 JavaScript 绑定和 Lua 绑定支持。
 
-##2、如何集成
+## 2、如何集成
 
 首先先按照[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs) 将 Yomob SDK 集成到你的 cocos2d-x 项目中。
 
@@ -84,7 +84,7 @@ public class AppActivity extends Cocos2dxActivity{
 
 >**【注意】1.4.3（含）之前的版本需要手动加入上述 Java 源代码文件，之后的版本不需要手动加入 Java 源文件，但是都必须调用上述的 `setup` 方法！！！**
 
-##3、脚本绑定
+## 3、脚本绑定
 
 如果你使用了 `JavaScript` 或者 `Lua` 脚本，那么你需要执行脚本绑定方法将 `TGSDK` 对象绑定到脚本运行环境去，具体的做法是在 `AppDelegate.cpp` 文件的 `bool AppDelegate::applicationDidFinishLaunching()` 方法中加入
 
@@ -100,9 +100,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 >**【注意】脚本绑定方法一定要在任何脚本文件执行之前调用完成！**
 
-##4、如何使用
+## 4、如何使用
 
-###Debug 模式开关
+### Debug 模式开关
 
 C++
 ```
@@ -122,7 +122,7 @@ yomob.TGSDK.setDebugModel(true)
 
 >**【注意】release 环境正式发布产品时记得关闭 Debug 模式**
 
-###初始化 TGSDK
+### 初始化 TGSDK
 
 C++
 ```
@@ -141,7 +141,29 @@ Lua
 yomob.TGSDK.initialize("Yomob AppID")
 ```
 
-###预加载广告
+### 当前网络状况
+
+C++
+```
+#include "TGSDKCocos2dxHelper.h"
+
+int net = yomob::TGSDKCocos2dxHelper::isWIFI();
+// net = 0  3G/4G 网络
+// net = 1  WIFI 网络
+// net = 2  未知网络/没有网络
+```
+
+JavaScript
+```
+var net = yomob.TGSDK.isWIFI();
+```
+
+Lua
+```
+local net = yomob.TGSDK.isWIFI()
+```
+
+### 预加载广告
 
 C++
 ```
@@ -158,7 +180,7 @@ Lua
 yomob.TGSDK.preload()
 ```
 
-###显示广告
+### 显示广告
 
 C++
 ```
@@ -181,7 +203,7 @@ if yomob.TGSDK.couldShowAd("Scene ID") then
 end
 ```
 
-###场景参数
+### 场景参数
 
 什么是场景参数？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
 
@@ -205,7 +227,7 @@ local param = yomob.TGSDK.parameterFromAdScene("Your Scene id", "Your Key")
 ```
 
 
-###用户广告行为追踪
+### 用户广告行为追踪
 
 什么是用户广告行为追踪？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
 
@@ -233,7 +255,7 @@ yomob.TGSDK.showAdScene("Scene ID")
 yomob.TGSDK.reportAdRejected("Scene ID")
 ```
 
-###事件回调触发
+### 事件回调触发
 
 所有[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)中描述的相关事件我们在 cocos2d-x 中都使用 `CustomEvent` 事件进行了触发，具体的事件有
 
