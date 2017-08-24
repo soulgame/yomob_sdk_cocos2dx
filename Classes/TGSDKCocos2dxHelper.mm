@@ -1261,12 +1261,87 @@ void TGSDKCocos2dxHelper::sendCounter(const std::string name, const std::string 
 #endif
 }
 
+#ifdef TGSDK_COCOS2DX_2X
+static TGSDKCocos2dxSDKDelegate* __tgsdk_sdk_delegate = NULL;
+static TGSDKCocos2dxPreloadDelegate* __tgsdk_preload_delegate = NULL;
+static TGSDKCocos2dxADDelegate* __tgsdk_ad_delegate = NULL;
+static TGSDKCocos2dxRewardDelegate* __tgsdk_reward_delegate = NULL;
+void TGSDKCocos2dxHelper::setSDKDelegate(TGSDKCocos2dxSDKDelegate *delegate) {
+    __tgsdk_sdk_delegate = delegate;
+}
+void TGSDKCocos2dxHelper::setPreloadDelegate(TGSDKCocos2dxPreloadDelegate *delegate) {
+    __tgsdk_preload_delegate = delegate;
+}
+void TGSDKCocos2dxHelper::setADDelegate(TGSDKCocos2dxADDelegate *delegate) {
+    __tgsdk_ad_delegate = delegate;
+}
+void TGSDKCocos2dxHelper::setRewardDelegate(TGSDKCocos2dxRewardDelegate *delegate) {
+    __tgsdk_reward_delegate = delegate;
+}
+#endif
+
 
 void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string result) {
+#ifdef TGSDK_COCOS2DX_2X
+    if (event.compare(TGSDK_EVENT_INIT_SUCCESS) == 0) {
+        if (__tgsdk_sdk_delegate) {
+            __tgsdk_sdk_delegate->onInitSuccess(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_INIT_FAILED) == 0) {
+        if (__tgsdk_sdk_delegate) {
+            __tgsdk_sdk_delegate->onInitFailed(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_PRELOAD_SUCCESS) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onPreloadSuccess(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_PRELOAD_FAILED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onPreloadFailed(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_CPAD_LOADED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onCPADLoaded(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_VIDEOAD_LOADED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onVideoADLoaded(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_AD_SHOW_SUCCESS) == 0) {
+        if (__tgsdk_ad_delegate) {
+            __tgsdk_ad_delegate->onShowSuccess(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_AD_SHOW_FAILED) == 0) {
+        if (__tgsdk_ad_delegate) {
+            __tgsdk_ad_delegate->onShowFailed(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_AD_COMPLETE) == 0) {
+        if (__tgsdk_ad_delegate) {
+            __tgsdk_ad_delegate->onADComplete(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_AD_CLICK) == 0) {
+        if (__tgsdk_ad_delegate) {
+            __tgsdk_ad_delegate->onADClick(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_AD_CLOSE) == 0) {
+        if (__tgsdk_ad_delegate) {
+            __tgsdk_ad_delegate->onADClose(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_REWARD_SUCCESS) == 0) {
+        if (__tgsdk_reward_delegate) {
+            __tgsdk_reward_delegate->onADAwardSuccess(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_REWARD_FAILED) == 0) {
+        if (__tgsdk_reward_delegate) {
+            __tgsdk_reward_delegate->onADAwardFailed(result);
+        }
+    }
+#else
     cocos2d::EventCustom customEvent(event);
     customEvent.setUserData((void*) result.c_str());
     auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
     dispatcher->dispatchEvent(&customEvent);
+#endif
 #ifdef TGSDK_BIND_JS
     Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
         JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
