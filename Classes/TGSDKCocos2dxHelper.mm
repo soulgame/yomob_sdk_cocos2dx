@@ -47,6 +47,7 @@ std::string __tgsdk_jstring_to_stdstring(JNIEnv* env, jstring srcjStr) {
 #include "jsapi.h"
 #include "jsfriendapi.h"
 #include "scripting/js-bindings/manual/ScriptingCore.h"
+#include <stdlib.h>
 
 #define JSTGSDKClass "TGSDK"
 JSClass *jsb_TGSDK_class;
@@ -72,6 +73,11 @@ JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLICK)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
+
+JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
+JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
+JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_MEDIUM_PAYMENT_USER)
+JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_LARGE_PAYMENT_USER)
 
 
 
@@ -291,6 +297,60 @@ bool jsb_TGSDK_function_sendCounter(JSContext* cx, uint32_t argc, jsval* vp) {
     return false;
 }
 
+bool jsb_TGSDK_function_tagPayingUser(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.tagPayingUser called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    std::string payingUser;
+    std::string currency = "";
+    float currentAmount = 0;
+    float totalAmount = 0;
+    bool ok = true;
+    if (1 <= argc) {
+        ok &= jsval_to_std_string(cx, args.get(0), &payingUser);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.tagPayingUser user must be string");
+        if (!ok) {
+            return false;
+        }
+    }
+    if (2 <= argc) {
+        ok &= jsval_to_std_string(cx, args.get(1), &currency);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.tagPayingUser currency must be string");
+    }
+    if (3 <= argc) {
+        JSString *jsstr = JS::ToString(cx, args.get(2));
+        JSB_PRECONDITION2(jsstr, cx, false, "JSB TGSDK.tagPayingUser currentAmount must be number");
+        char *str = JS_EncodeString(cx, jsstr);
+        JSB_PRECONDITION2(str, cx, false, "JSB TGSDK.tagPayingUser currentAmount must be number");
+        char *endptr;
+        currentAmount = strtof(str, &endptr);
+    }
+    if (4 <= argc) {
+        JSString *jsstr = JS::ToString(cx, args.get(3));
+        JSB_PRECONDITION2(jsstr, cx, false, "JSB TGSDK.tagPayingUser totalAmount must be number");
+        char *str = JS_EncodeString(cx, jsstr);
+        JSB_PRECONDITION2(str, cx, false, "JSB TGSDK.tagPayingUser totalAmount must be number");
+        char *endptr;
+        totalAmount = strtof(str, &endptr);
+    }
+    if (payingUser.compare(TGPAYINGUSER_NON_PAYING_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxNonPayingUser,
+            currency, currentAmount, totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_SMALL_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxSmallPaymentUser,
+            currency, currentAmount, totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_MEDIUM_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxMediumPaymentUser,
+            currency, currentAmount, totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_LARGE_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxLargePaymentUser,
+            currency, currentAmount, totalAmount);
+    } else {
+        LOGD("JSB TGSDK.tagPayingUser invalid user tag : %s", payingUser.c_str());
+        JSB_PRECONDITION2(false, cx, false, "JSB TGSDK.tagPayingUser invalid user tag");
+    }
+    return true;
+}
+
 void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
     JS::RootedObject yomob(cx);
     JS::RootedValue yomobval(cx);
@@ -330,6 +390,7 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("reportAdRejected", jsb_TGSDK_function_reportAdRejected, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAdScene", jsb_TGSDK_function_showAdScene, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("sendCounter", jsb_TGSDK_function_sendCounter, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("tagPayingUser", jsb_TGSDK_function_tagPayingUser, 4, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FS_END
     };
     
@@ -347,6 +408,10 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_PSG("TGSDK_EVENT_AD_CLOSE", jsb_TGSDK_EVENT_AD_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_REWARD_SUCCESS", jsb_TGSDK_EVENT_REWARD_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_REWARD_FAILED", jsb_TGSDK_EVENT_REWARD_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGPAYINGUSER_NON_PAYING_USER", jsb_TGPAYINGUSER_NON_PAYING_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGPAYINGUSER_SMALL_PAYMENT_USER", jsb_TGPAYINGUSER_SMALL_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGPAYINGUSER_MEDIUM_PAYMENT_USER", jsb_TGPAYINGUSER_MEDIUM_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGPAYINGUSER_LARGE_PAYMENT_USER", jsb_TGPAYINGUSER_LARGE_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PS_END
     };
     
@@ -395,6 +460,11 @@ LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
 
+LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
+LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
+LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_MEDIUM_PAYMENT_USER)
+LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_LARGE_PAYMENT_USER)
+
 #ifdef __cplusplus
 static int tolua_collect_TGSDK (lua_State* tolua_S) {
     TGSDKCocos2dxHelper* self = (TGSDKCocos2dxHelper*) tolua_tousertype(tolua_S,1,0);
@@ -421,6 +491,27 @@ bool __luaval_to_std_string(lua_State* L, int lo, std::string* outValue, const c
         *outValue = tolua_tocppstring(L,lo,NULL);
     }
     
+    return ok;
+}
+
+bool __luaval_to_number(lua_State* L,int lo,double* outValue, const char* funcName)
+{
+    if (NULL == L || NULL == outValue)
+        return false;
+
+    bool ok = true;
+
+    tolua_Error tolua_err;
+    if (!tolua_isnumber(L,lo,0,&tolua_err))
+    {
+        ok = false;
+    }
+
+    if (ok)
+    {
+        *outValue = tolua_tonumber(L, lo, 0);
+    }
+
     return ok;
 }
 
@@ -647,6 +738,51 @@ static int tolua_TGSDK_function_sendCounter(lua_State* tolua_S) {
     return 0;
 }
 
+static int tolua_TGSDK_function_tagPayingUser(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.tagPayingUser called");
+    tolua_Error tolua_err;
+    std::string payingUser;
+    std::string currency = "";
+    double currentAmount = 0;
+    double totalAmount = 0;
+    bool ok = true;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
+        ok &= __luaval_to_std_string(tolua_S, 1, &payingUser, "tagPayingUser");
+        if (!ok) {
+            LOGD("Lua TGSDK.payingUser user must be string");
+            return 0;
+        }
+    } else {
+        tolua_error(tolua_S, "#ferror in function 'TGSDK.tagPayingUser'.", &tolua_err);
+        return 0;
+    }
+    if (tolua_isstring(tolua_S, 2, 0, &tolua_err)) {
+        ok &= __luaval_to_std_string(tolua_S, 2, &currency, "tagPayingUser");
+    }
+    if (tolua_isnumber(tolua_S, 3, 0, &tolua_err)) {
+        ok &= __luaval_to_number(tolua_S, 3, &currentAmount, "tagPayingUser");
+    }
+    if (tolua_isnumber(tolua_S, 4, 0, &tolua_err)) {
+        ok &= __luaval_to_number(tolua_S, 4, &totalAmount, "tagPayingUser");
+    }
+    if (payingUser.compare(TGPAYINGUSER_NON_PAYING_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxNonPayingUser,
+            currency, (float)currentAmount, (float)totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_SMALL_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxSmallPaymentUser,
+            currency, (float)currentAmount, (float)totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_MEDIUM_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxMediumPaymentUser,
+            currency, (float)currentAmount, (float)totalAmount);
+    } else if (payingUser.compare(TGPAYINGUSER_LARGE_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxLargePaymentUser,
+            currency, (float)currentAmount, (float)totalAmount);
+    } else {
+        LOGD("LUA TGSDK.tagPayingUser invalid user tag : %s", payingUser.c_str());
+    }
+    return 0;
+}
+
 TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
     tolua_open(tolua_S);
     tolua_usertype(tolua_S, "yomob.TGSDK");
@@ -671,6 +807,10 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGPAYINGUSER_NON_PAYING_USER", tolua_TGPAYINGUSER_NON_PAYING_USER, nullptr);
+        tolua_variable(tolua_S, "TGPAYINGUSER_SMALL_PAYMENT_USER", tolua_TGPAYINGUSER_SMALL_PAYMENT_USER, nullptr);
+        tolua_variable(tolua_S, "TGPAYINGUSER_MEDIUM_PAYMENT_USER", tolua_TGPAYINGUSER_MEDIUM_PAYMENT_USER, nullptr);
+        tolua_variable(tolua_S, "TGPAYINGUSER_LARGE_PAYMENT_USER", tolua_TGPAYINGUSER_LARGE_PAYMENT_USER, nullptr);
         tolua_function(tolua_S, "setSDKConfig", tolua_TGSDK_function_setSDKConfig);
         tolua_function(tolua_S, "getSDKConfig", tolua_TGSDK_function_getSDKConfig);
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
@@ -684,6 +824,7 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "reportAdRejected", tolua_TGSDK_function_reportAdRejected);
         tolua_function(tolua_S, "showAdScene", tolua_TGSDK_function_showAdScene);
         tolua_function(tolua_S, "sendCounter", tolua_TGSDK_function_sendCounter);
+        tolua_function(tolua_S, "tagPayingUser", tolua_TGSDK_function_tagPayingUser);
       tolua_endmodule(tolua_S);
     tolua_endmodule(tolua_S);
 	return 1;
@@ -1258,6 +1399,78 @@ void TGSDKCocos2dxHelper::sendCounter(const std::string name, const std::string 
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK sendCounter:[NSString stringWithUTF8String:name.c_str()]
            metaDataJson:[NSString stringWithUTF8String:metaData.c_str()]];
+#endif
+}
+
+void TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocosedxPayingUser user, const std::string currency, float currentAmount, float totalAmount) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                minfo,
+                                                JTGSDKCocos2dxHelper,
+                                                "tagPayingUser",
+                                                "(Ljava/lang/String;Ljava/lang/String;FF)V"
+    );
+    if (isHave) {
+        jstring juser;
+        jstring jcurrency;
+        switch(user) {
+        case TGSDKCocos2dxNonPayingUser:
+            juser = minfo.env->NewStringUTF("none");
+            break;
+        case TGSDKCocos2dxSmallPaymentUser:
+            juser = minfo.env->NewStringUTF("small");
+            break;
+        case TGSDKCocos2dxMediumPaymentUser:
+            juser = minfo.env->NewStringUTF("medium");
+            break;
+        case TGSDKCocos2dxLargePaymentUser:
+            juser = minfo.env->NewStringUTF("large");
+            break;
+        default:
+            return;
+        }
+        jcurrency = minfo.env->NewStringUTF(currency.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        juser,
+                                        jcurrency,
+                                        currentAmount,
+                                        totalAmount);
+        minfo.env->DeleteLocalRef(juser);
+        minfo.env->DeleteLocalRef(jcurrency);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni tagPayingUser( (Ljava/lang/String;Ljava/lang/String;FF)V ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    switch (user) {
+    case TGSDKCocos2dxNonPayingUser:
+        [TGSDK tagPayingUser:TGNonPayingUser
+                WithCurrency:[NSString stringWithUTF8String:currency.c_str()]
+            AndCurrentAmount:currentAmount
+              AndTotalAmount:totalAmount];
+        break;
+    case TGSDKCocos2dxSmallPaymentUser:
+        [TGSDK tagPayingUser:TGSmallPaymentUser
+                WithCurrency:[NSString stringWithUTF8String:currency.c_str()]
+            AndCurrentAmount:currentAmount
+              AndTotalAmount:totalAmount];
+        break;
+    case TGSDKCocos2dxMediumPaymentUser:
+        [TGSDK tagPayingUser:TGMediumPaymentUser
+                WithCurrency:[NSString stringWithUTF8String:currency.c_str()]
+            AndCurrentAmount:currentAmount
+              AndTotalAmount:totalAmount];
+        break;
+    case TGSDKCocos2dxLargePaymentUser:
+        [TGSDK tagPayingUser:TGLargePaymentUser
+                WithCurrency:[NSString stringWithUTF8String:currency.c_str()]
+            AndCurrentAmount:currentAmount
+              AndTotalAmount:totalAmount];
+        break;
+    }
 #endif
 }
 

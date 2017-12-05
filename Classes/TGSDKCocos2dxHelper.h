@@ -27,9 +27,20 @@
 #define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"
 #define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
 
+#define TGPAYINGUSER_NON_PAYING_USER     "TGSDK_NON_PAYING_USER"
+#define TGPAYINGUSER_SMALL_PAYMENT_USER  "TGSDK_SMALL_PAYMENT_USER"
+#define TGPAYINGUSER_MEDIUM_PAYMENT_USER "TGSDK_MEDIUM_PAYMENT_USER"
+#define TGPAYINGUSER_LARGE_PAYMENT_USER  "TGSDK_LARGE_PAYMENT_USER"
+
 #include "cocos2d.h"
 
 namespace yomob {
+    typedef enum {
+        TGSDKCocos2dxNonPayingUser,
+        TGSDKCocos2dxSmallPaymentUser,
+        TGSDKCocos2dxMediumPaymentUser,
+        TGSDKCocos2dxLargePaymentUser
+    } TGSDKCocosedxPayingUser;
 #ifdef TGSDK_COCOS2DX_2X
     class TGSDKCocos2dxSDKDelegate {
     public:
@@ -87,6 +98,8 @@ namespace yomob {
         static void showAdScene(const std::string scene);
 
         static void sendCounter(const std::string name, const std::string metaData);
+
+        static void tagPayingUser(yomob::TGSDKCocosedxPayingUser user, const std::string currency, float currentAmount, float totalAmount);
 
 #ifdef TGSDK_COCOS2DX_2X
         static void setSDKDelegate(TGSDKCocos2dxSDKDelegate *delegate);
