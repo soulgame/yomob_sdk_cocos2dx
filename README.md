@@ -1,5 +1,7 @@
 # Yomob SDK for Cocos2d-x
 
+>**【注意】由于 `1.7.x` 版本新增了付费用户追踪接口，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.7.x 版本或是使用 Tag 为 1.7.0 之前的 Cocos2d-x 封装代码来兼容以前的版本**
+
 >**【注意】由于 `1.6.x` 版本新增了场景参数接口，如果使用 1.5.x 以前的版本 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.6.x 版本或是使用 Tag 为 `1.5.x` 的 Cocos2d-x 封装代码来兼容 1.5.x 以前的 TGSDK 接口实现**
 >
 >**【注意】由于 `1.6.5` 版本新增了广告测试工具接口，如果你使用 1.6.5 版本以前的 TGSDK 接入会由于缺少新接口实现导致无法成功编译，请尽快升级你的 TGSDK 到最新版本或是使用 Tag 为 `1.6.4` 的 Cocos2d-x 封装代码来兼容**
@@ -126,26 +128,30 @@ yomob.TGSDK.setDebugModel(true)
 
 ### 初始化 TGSDK
 
-C++
+**C++**
+
 ```
 #include "TGSDKCocos2dxHelper.h"
 
 yomob::TGSDKCocos2dxHelper::initialize("Yomob AppID");
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 yomob.TGSDK.initialize("Yomob AppID");
 ```
 
-Lua
+**Lua**
+
 ```
 yomob.TGSDK.initialize("Yomob AppID")
 ```
 
 ### 当前网络状况
 
-C++
+**C++**
+
 ```
 #include "TGSDKCocos2dxHelper.h"
 
@@ -155,50 +161,58 @@ int net = yomob::TGSDKCocos2dxHelper::isWIFI();
 // net = 2  未知网络/没有网络
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 var net = yomob.TGSDK.isWIFI();
 ```
 
-Lua
+**Lua**
+
 ```
 local net = yomob.TGSDK.isWIFI()
 ```
 
 ### 预加载广告
 
-C++
+**C++**
+
 ```
 yomob::TGSDKCocos2dxHelper::preload();
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 yomob.TGSDK.preload();
 ```
 
-Lua
+**Lua**
+
 ```
 yomob.TGSDK.preload()
 ```
 
 ### 显示广告
 
-C++
+**C++**
+
 ```
 if (yomob::TGSDKCocos2dxHelper::couldShowAd("Scene ID")) {
     yomob::TGSDKCocos2dxHelper::showAd("Scene ID");
 }
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 if (yomob.TGSDK.couldShowAd("Scene ID")) {
     yomob.TGSDK.showAd("Scene ID");
 }
 ```
 
-Lua
+**Lua**
+
 ```
 if yomob.TGSDK.couldShowAd("Scene ID") then
     yomob.TGSDK.showAd("Scene ID")
@@ -207,17 +221,20 @@ end
 
 ### 显示广告测试工具（1.6.5 以上）
 
-C++
+**C++**
+
 ```
 yomob::TGSDKCocos2dxHelper::showTestView("Scene ID");
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 yomob.TGSDK.showTestView("Scene ID");
 ```
 
-Lua
+**Lua**
+
 ```
 yomob.TGSDK.showTestView("Scene ID")
 ```
@@ -226,7 +243,8 @@ yomob.TGSDK.showTestView("Scene ID")
 
 什么是场景参数？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
 
-C++
+**C++**
+
 ```
 std::string param1 = yomob::TGSDKCocos2dxHelper::getStringParameterFromAdScene("Your Scene id", "Your Key");
 
@@ -235,22 +253,80 @@ int param2 = yomob::TGSDKCocos2dxHelper::getIntParameterFromAdScene("Your Scene 
 float param3 = yomob::TGSDKCocos2dxHelper::getFloatParameterFromAdScene("Your Scene id", "Your Key");
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 var param = yomob.TGSDK.parameterFromAdScene("Your Scene id", "Your Key");
 ```
 
-Lua
+**Lua**
+
 ```
 local param = yomob.TGSDK.parameterFromAdScene("Your Scene id", "Your Key")
 ```
 
+### 付费用户追踪（1.7.0 以上）
+
+什么是付费用户追踪？具体请参看[《YoMob 广告 SDK 官方文档》](https://support.yomob.com/docs/sdk/introduction/ios/#TGSDK_tagPayingUser)
+
+付费用户标识
+
+**C++**
+
+```
+    typedef enum {
+        TGSDKCocos2dxNonPayingUser,        // 非付费用户
+        TGSDKCocos2dxSmallPaymentUser,     // 小额付费用户
+        TGSDKCocos2dxMediumPaymentUser,    // 中等额度付费用户
+        TGSDKCocos2dxLargePaymentUser      // 大额付费用户
+    } TGSDKCocosedxPayingUser;
+
+```
+
+**JavaScript & Lua**
+
+```
+yomob.TGSDK.TGPAYINGUSER_NON_PAYING_USER        // 非付费用户
+yomob.TGSDK.TGPAYINGUSER_SMALL_PAYMENT_USER     // 小额付费用户
+yomob.TGSDK.TGPAYINGUSER_MEDIUM_PAYMENT_USER    // 中等额度付费用户
+yomob.TGSDK.TGPAYINGUSER_LARGE_PAYMENT_USER     // 大额付费用户
+```
+
+调用方法
+
+**C++**
+
+```
+yomob::TGSDKCocos2dxHelper::tagPayingUser(
+        TGSDKCocos2dxSmallPaymentUser,
+        "USD",
+        10, 500);
+```
+
+**JavaScript**
+
+```
+yomob.TGSDK.tagPayingUser(
+        yomob.TGSDK.TGPAYINGUSER_NON_PAYING_USER,
+        "", 0, 0
+);
+```
+
+**Lua**
+
+```
+yomob.TGSDK.tagPayingUser(
+        yomob.TGSDK.TGPAYINGUSER_LARGE_PAYMENT_USER,
+        "CNY", 648, 1280
+)
+```
 
 ### 用户广告行为追踪
 
 什么是用户广告行为追踪？具体请参看[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)
 
-C++
+**C++**
+
 ```
 // 广告 UI 被用户看到
 yomob::TGSDKCocos2dxHelper::showAdScene("Scene ID");
@@ -258,7 +334,8 @@ yomob::TGSDKCocos2dxHelper::showAdScene("Scene ID");
 yomob::TGSDKCocos2dxHelper::reportAdRejected("Scene ID");
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 // 广告 UI 被用户看到
 yomob.TGSDK.showAdScene("Scene ID");
@@ -266,7 +343,8 @@ yomob.TGSDK.showAdScene("Scene ID");
 yomob.TGSDK.showAdScene("Scene ID");
 ```
 
-Lua
+**Lua**
+
 ```
 -- 广告 UI 被用户看到
 yomob.TGSDK.showAdScene("Scene ID")
@@ -278,7 +356,8 @@ yomob.TGSDK.reportAdRejected("Scene ID")
 
 所有[《Yomob 广告 SDK 官方文档》](https://support.yomob.com/docs)中描述的相关事件我们在 cocos2d-x 中都使用 `CustomEvent` 事件进行了触发，具体的事件有
 
-C++
+**C++**
+
 ```
 // SDK 初始化成功
 #define TGSDK_EVENT_INIT_SUCCESS "TGSDK_onInitSuccess"
@@ -312,7 +391,8 @@ C++
 
 ```
 
-JavaScript & Lua
+**JavaScript & Lua**
+
 ```
 // SDK 初始化成功
 yomob.TGSDK.TGSDK_EVENT_INIT_SUCCESS
@@ -348,7 +428,8 @@ yomob.TGSDK.TGSDK_EVENT_REWARD_FAILED
 
 如果不想使用 `CustomEvent` 的方式来处理回调事件的话，我们还支持回调方法
 
-C++
+**C++**
+
 ```
 EventListenerCustom* sdkListener = NULL;
     
@@ -431,7 +512,8 @@ EventListenerCustom* sdkListener = NULL;
     Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
 ```
 
-JavaScript
+**JavaScript**
+
 ```
 yomob.TGSDK.prototype.onInitSuccess = function(ret) {
     cc.log("SDK 初始化完成");
@@ -486,7 +568,8 @@ yomob.TGSDK.prototype.onADAwardFailed = function(ret) {
 };
 ```
 
-Lua
+**Lua**
+
 ```
 yomob.TGSDK.onInitSuccess = function(ret)
     print("SDK 初始化完成")
