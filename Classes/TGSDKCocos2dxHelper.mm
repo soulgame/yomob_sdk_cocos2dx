@@ -351,6 +351,50 @@ bool jsb_TGSDK_function_tagPayingUser(JSContext* cx, uint32_t argc, jsval* vp) {
     return true;
 }
 
+bool jsb_TGSDK_function_getUserGDPRConsentStatus(JSContext *cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.getUserGDPRConsentStatus called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    std::string status = TGSDKCocos2dxHelper::getUserGDPRConsentStatus();
+    args.rval().set(std_string_to_jsval(cx, status));
+    return true;
+}
+
+bool jsb_TGSDK_function_setUserGDPRConsentStatus(JSContext* cx, uint32_t argc, jsval *vp) {
+    LOGD("JSB TGSDK.setUserGDPRConsentStatus called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string status;
+        bool ok = jsval_to_std_string(cx, args.get(0), &status);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setUserGDPRConsentStatus status must be string");
+        TGSDKCocos2dxHelper::setUserGDPRConsentStatus(status);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.setUserGDPRConsentStatus: Wrong number of arguments");
+    return false;
+}
+
+bool jsb_TGSDK_function_getIsAgeRestrictedUser(JSContext *cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.getIsAgeRestrictedUser called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    std::string status = TGSDKCocos2dxHelper::getIsAgeRestrictedUser();
+    args.rval().set(std_string_to_jsval(cx, status));
+    return true;
+}
+
+bool jsb_TGSDK_function_setIsAgeRestrictedUser(JSContext* cx, uint32_t argc, jsval *vp) {
+    LOGD("JSB TGSDK.setIsAgeRestrictedUser called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string status;
+        bool ok = jsval_to_std_string(cx, args.get(0), &status);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setIsAgeRestrictedUser status must be string");
+        TGSDKCocos2dxHelper::setIsAgeRestrictedUser(status);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.setIsAgeRestrictedUser: Wrong number of arguments");
+    return false;
+}
+
 void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
     JS::RootedObject yomob(cx);
     JS::RootedValue yomobval(cx);
@@ -391,6 +435,10 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("showAdScene", jsb_TGSDK_function_showAdScene, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("sendCounter", jsb_TGSDK_function_sendCounter, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("tagPayingUser", jsb_TGSDK_function_tagPayingUser, 4, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("getUserGDPRConsentStatus", jsb_TGSDK_function_getUserGDPRConsentStatus, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("setUserGDPRConsentStatus", jsb_TGSDK_function_setUserGDPRConsentStatus, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("getIsAgeRestrictedUser", jsb_TGSDK_function_getIsAgeRestrictedUser, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("setIsAgeRestrictedUser", jsb_TGSDK_function_setIsAgeRestrictedUser, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FS_END
     };
     
@@ -783,6 +831,52 @@ static int tolua_TGSDK_function_tagPayingUser(lua_State* tolua_S) {
     return 0;
 }
 
+static int tolua_TGSDK_function_setUserGDPRConsentStatus(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.setUserGDPRConsentStatus called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
+        std::string status;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &status, "setUserGDPRConsentStatus");
+        if (ok) {
+            TGSDKCocos2dxHelper::setUserGDPRConsentStatus(status);
+        }
+    } else {
+        LOGD("Lua TGSDK.setUserGDPRConsentStatus: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.setUserGDPRConsentStatus'.",&tolua_err);
+    }
+    return 0;
+}
+
+static int tolua_TGSDK_function_getUserGDPRConsentStatus(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.getUserGDPRConsentStatus called");
+    std::string status = TGSDKCocos2dxHelper::getUserGDPRConsentStatus();
+    tolua_pushstring(tolua_S, status.c_str());
+    return 1;
+}
+
+static int tolua_TGSDK_function_setIsAgeRestrictedUser(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.setIsAgeRestrictedUser called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
+        std::string status;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &status, "setIsAgeRestrictedUser");
+        if (ok) {
+            TGSDKCocos2dxHelper::setIsAgeRestrictedUser(status);
+        }
+    } else {
+        LOGD("Lua TGSDK.setIsAgeRestrictedUser: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.setIsAgeRestrictedUser'.",&tolua_err);
+    }
+    return 0;
+}
+
+static int tolua_TGSDK_function_getIsAgeRestrictedUser(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.getIsAgeRestrictedUser called");
+    std::string status = TGSDKCocos2dxHelper::getIsAgeRestrictedUser();
+    tolua_pushstring(tolua_S, status.c_str());
+    return 1;
+}
+
 TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
     tolua_open(tolua_S);
     tolua_usertype(tolua_S, "yomob.TGSDK");
@@ -825,6 +919,10 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "showAdScene", tolua_TGSDK_function_showAdScene);
         tolua_function(tolua_S, "sendCounter", tolua_TGSDK_function_sendCounter);
         tolua_function(tolua_S, "tagPayingUser", tolua_TGSDK_function_tagPayingUser);
+        tolua_function(tolua_S, "getUserGDPRConsentStatus", tolua_TGSDK_function_getUserGDPRConsentStatus);
+        tolua_function(tolua_S, "setUserGDPRConsentStatus", tolua_TGSDK_function_setUserGDPRConsentStatus);
+        tolua_function(tolua_S, "getIsAgeRestrictedUser", tolua_TGSDK_function_getIsAgeRestrictedUser);
+        tolua_function(tolua_S, "setIsAgeRestrictedUser", tolua_TGSDK_function_setIsAgeRestrictedUser);
       tolua_endmodule(tolua_S);
     tolua_endmodule(tolua_S);
 	return 1;
@@ -1471,6 +1569,108 @@ void TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocosedxPayingUser user, const std:
               AndTotalAmount:totalAmount];
         break;
     }
+#endif
+}
+
+void TGSDKCocos2dxHelper::setUserGDPRConsentStatus(const std::string status) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKClass,
+                                                 "setUserGDPRConsentStatus",
+                                                 "(Ljava/lang/String;)V");
+    if (isHave) {
+        jstring jstatus = minfo.env->NewStringUTF(status.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jstatus);
+        minfo.env->DeleteLocalRef(jstatus);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDK jni setUserGDPRConsentStatus( status ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK setUserGDPRConsentStatus:[NSString stringWithUTF8String:status.c_str()]];
+#endif
+}
+
+std::string TGSDKCocos2dxHelper::getUserGDPRConsentStatus() {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                             minfo,
+                                             JTGSDKClass,
+                                             "getUserGDPRConsentStatus",
+                                             "()Ljava/lang/String;"
+    );
+    if (isHave) {
+        jstring jstatus = (jstring)minfo.env->CallStaticObjectMethod(
+                                                         minfo.classID,
+                                                         minfo.methodID);
+        std::string status = JniHelper::jstring2string(jstatus);
+        minfo.env->DeleteLocalRef(jstatus);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return status;
+    } else {
+        LOGD("TGSDK jni getUserGDPRConsentStatus() not found");
+    }
+    return "";
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    NSString *status = [TGSDK getUserGDPRConsentStatus];
+    return (status?[status UTF8String]:"");
+#endif
+}
+
+void TGSDKCocos2dxHelper::setIsAgeRestrictedUser(const std::string status) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKClass,
+                                                 "setIsAgeRestrictedUser",
+                                                 "(Ljava/lang/String;)V");
+    if (isHave) {
+        jstring jstatus = minfo.env->NewStringUTF(status.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jstatus);
+        minfo.env->DeleteLocalRef(jstatus);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDK jni setIsAgeRestrictedUser( status ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK setIsAgeRestrictedUser:[NSString stringWithUTF8String:status.c_str()]];
+#endif
+}
+
+std::string TGSDKCocos2dxHelper::getIsAgeRestrictedUser() {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                             minfo,
+                                             JTGSDKClass,
+                                             "getIsAgeRestrictedUser",
+                                             "()Ljava/lang/String;"
+    );
+    if (isHave) {
+        jstring jstatus = (jstring)minfo.env->CallStaticObjectMethod(
+                                                         minfo.classID,
+                                                         minfo.methodID);
+        std::string status = JniHelper::jstring2string(jstatus);
+        minfo.env->DeleteLocalRef(jstatus);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        return status;
+    } else {
+        LOGD("TGSDK jni getIsAgeRestrictedUser() not found");
+    }
+    return "";
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    NSString *status = [TGSDK getIsAgeRestrictedUser];
+    return (status?[status UTF8String]:"");
 #endif
 }
 

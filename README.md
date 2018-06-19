@@ -1,5 +1,7 @@
 # Yomob SDK for Cocos2d-x
 
+>**【注意】由于 `1.8.x` 版本新增了 GDPR 相关合规接口，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.8.x 版本或是使用 Tag 为 1.8.0 之前的 Cocos2d-x 封装代码来兼容以前的版本**
+
 >**【注意】由于 `1.7.x` 版本新增了付费用户追踪接口，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.7.x 版本或是使用 Tag 为 1.7.0 之前的 Cocos2d-x 封装代码来兼容以前的版本**
 
 >**【注意】由于 `1.6.x` 版本新增了场景参数接口，如果使用 1.5.x 以前的版本 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.6.x 版本或是使用 Tag 为 `1.5.x` 的 Cocos2d-x 封装代码来兼容 1.5.x 以前的 TGSDK 接口实现**
@@ -319,6 +321,114 @@ yomob.TGSDK.tagPayingUser(
         yomob.TGSDK.TGPAYINGUSER_LARGE_PAYMENT_USER,
         "CNY", 648, 1280
 )
+```
+
+### GDPR 合规支持(1.8.0 以上)
+
+截至 2018 年 5 月 25 日，“通用数据保护条例”（GDPR）将在欧盟实施。 为了遵守GDPR，开发者有两种选择。
+
+- 推荐做法： 开发者自行控制用户级别的 GDPR 同意过程，然后将用户的选择传达给 TGSDK。 为此，开发人员可以使用自己的机制收集用户的同意，然后通过调用 TGSDK 的 API 来更新或查询用户的同意状态。
+
+- 默认做法：允许 TGSDK 自行处理要求。 TGSDK 会在为欧洲用户请求广告之前展示同意对话框，并会记住用户对后续广告的同意或拒绝。
+
+**C++**
+
+```
+// 获取用户针对 GDRP 法规的选择状态
+// yes = 同意
+// no = 拒绝
+// 空字符串 = 用户未做出选择
+
+std::string status = yomob::TGSDKCocos2dxHelper::getUserGDPRConsentStatus();
+
+
+// 设置用户针对 GDPR 法规的选择状态
+// yes = 同意
+// no = 拒绝
+
+yomob::TGSDKCocos2dxHelper::setUserGDPRConsentStatus("yes");
+
+
+// 获取用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+// 空字符串 = 用户未做出选择
+
+std::string status = yomob::TGSDKCocos2dxHelper::getIsAgeRestrictedUser();
+
+
+// 设置用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+
+yomob::TGSDKCocos2dxHelper::setIsAgeRestrictedUser("no");
+```
+
+**JavaScript**
+
+```
+// 获取用户针对 GDRP 法规的选择状态
+// yes = 同意
+// no = 拒绝
+// 空字符串 = 用户未做出选择
+
+var status = yomob.TGSDK.getUserGDPRConsentStatus();
+
+
+// 设置用户针对 GDPR 法规的选择状态
+// yes = 同意
+// no = 拒绝
+
+yomob.TGSDK.setUserGDPRConsentStatus("yes");
+
+
+// 获取用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+// 空字符串 = 用户未做出选择
+
+var status = yomob.TGSDK.getIsAgeRestrictedUser();
+
+
+// 设置用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+
+yomob.TGSDK.setIsAgeRestrictedUser("no");
+
+```
+
+**Lua**
+
+```
+// 获取用户针对 GDRP 法规的选择状态
+// yes = 同意
+// no = 拒绝
+// 空字符串 = 用户未做出选择
+
+local status = yomob.TGSDK.getUserGDPRConsentStatus()
+
+
+// 设置用户针对 GDPR 法规的选择状态
+// yes = 同意
+// no = 拒绝
+
+yomob.TGSDK.setUserGDPRConsentStatus("yes")
+
+
+// 获取用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+// 空字符串 = 用户未做出选择
+
+local status = yomob.TGSDK.getIsAgeRestrictedUser()
+
+
+// 设置用户是否是未成年受监管的用户
+// yes = 是，是受监管用户
+// no = 不是
+
+yomob.TGSDK.setIsAgeRestrictedUser("no")
 ```
 
 ### 用户广告行为追踪

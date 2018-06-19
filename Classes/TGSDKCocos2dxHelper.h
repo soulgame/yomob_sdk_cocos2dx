@@ -101,6 +101,12 @@ namespace yomob {
 
         static void tagPayingUser(yomob::TGSDKCocosedxPayingUser user, const std::string currency, float currentAmount, float totalAmount);
 
+        static std::string getUserGDPRConsentStatus();
+        static void setUserGDPRConsentStatus(const std::string status);
+
+        static std::string getIsAgeRestrictedUser();
+        static void setIsAgeRestrictedUser(const std::string status);
+
 #ifdef TGSDK_COCOS2DX_2X
         static void setSDKDelegate(TGSDKCocos2dxSDKDelegate *delegate);
         static void setPreloadDelegate(TGSDKCocos2dxPreloadDelegate *delegate);
