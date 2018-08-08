@@ -27,10 +27,19 @@
 #define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"
 #define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
 
+#define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"
+#define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"
+#define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"
+#define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"
+
 #define TGPAYINGUSER_NON_PAYING_USER     "TGSDK_NON_PAYING_USER"
 #define TGPAYINGUSER_SMALL_PAYMENT_USER  "TGSDK_SMALL_PAYMENT_USER"
 #define TGPAYINGUSER_MEDIUM_PAYMENT_USER "TGSDK_MEDIUM_PAYMENT_USER"
 #define TGPAYINGUSER_LARGE_PAYMENT_USER  "TGSDK_LARGE_PAYMENT_USER"
+
+#define TGSDK_BANNER_TYPE_NORMAL "TGBannerNormal"
+#define TGSDK_BANNER_TYPE_MEDIUM "TGBannerMediumRectangle"
+#define TGSDK_BANNER_TYPE_LARGE  "TGBannerLarge"
 
 #include "cocos2d.h"
 
@@ -70,6 +79,14 @@ namespace yomob {
         virtual void onADAwardSuccess(const std::string ret){};
         virtual void onADAwardFailed(const std::string ret){};
     };
+
+    class TGSDKCocos2dxBannerDelegate {
+    public:
+        virtual void onBannerLoaded(const std::string scene, const std::string ret){};
+        virtual void onBannerFailed(const std::string scene, const std::string ret const std::string error){};
+        virtual void onBannerClick(const std::string scene, const std::string ret){};
+        virtual void onBannerClose(const std::string scene, const std::string ret){};
+    }
 #endif
     class TGSDKCocos2dxHelper {
     public:
@@ -89,10 +106,12 @@ namespace yomob {
         static int getIntParameterFromAdScene(const std::string scene, const std::string key, int def = 0);
         static float getFloatParameterFromAdScene(const std::string scene, const std::string key, float def = 0);
         static std::string getStringParameterFromAdScene(const std::string scene, const std::string key, const std::string def = "");
+        static void setBannerConfig(const std::string scene, const std::string type, float x, float y, float width, float height, int interval);
         
         static bool couldShowAd(const std::string scene);
         static void showAd(const std::string scene);
         static void showTestView(const std::string scene);
+        static void closeBanner(const std::string scene);
 
         static void reportAdRejected(const std::string scene);
         static void showAdScene(const std::string scene);
@@ -112,6 +131,7 @@ namespace yomob {
         static void setPreloadDelegate(TGSDKCocos2dxPreloadDelegate *delegate);
         static void setADDelegate(TGSDKCocos2dxADDelegate *delegate);
         static void setRewardDelegate(TGSDKCocos2dxRewardDelegate *delegate);
+        static void setBannerDelegate(TGSDKCocos2dxBannerDelegate *delegate);
 #endif
         
         static void handleEvent(const std::string event, const std::string result);

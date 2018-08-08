@@ -73,13 +73,19 @@ JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLICK)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_LOADED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_FAILED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLICK)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLOSE)
 
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_MEDIUM_PAYMENT_USER)
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_LARGE_PAYMENT_USER)
 
-
+JSB_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_NORMAL)
+JSB_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_MEDIUM)
+JSB_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_LARGE)
 
 bool jsb_TGSDK_constructor(JSContext* cx, uint32_t argc, jsval *vp) {
     JS_ReportError(cx, "TGSDK could not be instantiated");
@@ -204,6 +210,35 @@ bool jsb_TGSDK_function_parameterFromAdScene(JSContext* cx, uint32_t argc, jsval
     return true;
 }
 
+bool jsb_TGSDK_function_setBannerConfig(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.setBannerConfig called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (7 == argc) {
+        std::string scene;
+        std::string type;
+        double x, y, width, height;
+        long interval;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig scene must be string");
+        ok &= jsval_to_std_string(cx, args.get(1), &type);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig type must be string");
+        ok &= ToNumber(cx, args.get(2), &x);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig x must be number");
+        ok &= ToNumber(cx, args.get(3), &y);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig y must be number");
+        ok &= ToNumber(cx, args.get(4), &width);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig width must be number");
+        ok &= ToNumber(cx, args.get(5), &height);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig height must be number");
+        ok &= jsval_to_long(cx, args.get(6), &interval);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.setBannerConfig interval must be number");
+        TGSDKCocos2dxHelper::setBannerConfig(scene, type, (float)x, (float)y, (float)width, (float)height, (int)interval);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.setBannerConfig: Wrong number of arguments");
+    return false;
+}
+
 bool jsb_TGSDK_function_couldShowAd(JSContext* cx, uint32_t argc, jsval* vp) {
     LOGD("JSB TGSDK.couldShowAd called");
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -246,6 +281,21 @@ bool jsb_TGSDK_function_showTestView(JSContext* cx, uint32_t argc, jsval* vp) {
         return true;
     }
     JS_ReportError(cx, "JSB TGSDK.showTestView: Wrong number of arguments");
+    return false;
+}
+
+bool jsb_TGSDK_function_closeBanner(JSContext* cx, uint32_t argc, jsval* vp) {
+    LOGD("JSB TGSDK.closeBanner called");
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    if (1 == argc) {
+        std::string scene;
+        bool ok = jsval_to_std_string(cx, args.get(0), &scene);
+        JSB_PRECONDITION2(ok, cx, false, "JSB TGSDK.closeBanner scene must be string");
+        TGSDKCocos2dxHelper::closeBanner(scene);
+        args.rval().set(JSVAL_NULL);
+        return true;
+    }
+    JS_ReportError(cx, "JSB TGSDK.closeBanner: Wrong number of arguments");
     return false;
 }
 
@@ -428,9 +478,11 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_FN("isWIFI", jsb_TGSDK_function_isWIFI, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("preload", jsb_TGSDK_function_preload, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("parameterFromAdScene", jsb_TGSDK_function_parameterFromAdScene, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("setBannerConfig", jsb_TGSDK_function_setBannerConfig, 7, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("couldShowAd", jsb_TGSDK_function_couldShowAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAd", jsb_TGSDK_function_showAd, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showTestView", jsb_TGSDK_function_showTestView, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_FN("closeBanner", jsb_TGSDK_function_closeBanner, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("reportAdRejected", jsb_TGSDK_function_reportAdRejected, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("showAdScene", jsb_TGSDK_function_showAdScene, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("sendCounter", jsb_TGSDK_function_sendCounter, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -456,10 +508,17 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_PSG("TGSDK_EVENT_AD_CLOSE", jsb_TGSDK_EVENT_AD_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_REWARD_SUCCESS", jsb_TGSDK_EVENT_REWARD_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_REWARD_FAILED", jsb_TGSDK_EVENT_REWARD_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_BANNER_LOADED", jsb_TGSDK_EVENT_BANNER_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_BANNER_FAILED", jsb_TGSDK_EVENT_BANNER_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_BANNER_CLICK", jsb_TGSDK_EVENT_BANNER_CLICK, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_BANNER_CLOSE", jsb_TGSDK_EVENT_BANNER_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_NON_PAYING_USER", jsb_TGPAYINGUSER_NON_PAYING_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_SMALL_PAYMENT_USER", jsb_TGPAYINGUSER_SMALL_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_MEDIUM_PAYMENT_USER", jsb_TGPAYINGUSER_MEDIUM_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_LARGE_PAYMENT_USER", jsb_TGPAYINGUSER_LARGE_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_BANNER_TYPE_NORMAL", jsb_TGSDK_BANNER_TYPE_NORMAL, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_BANNER_TYPE_MEDIUM", jsb_TGSDK_BANNER_TYPE_MEDIUM, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_BANNER_TYPE_LARGE", jsb_TGSDK_BANNER_TYPE_LARGE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PS_END
     };
     
@@ -507,11 +566,19 @@ LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLICK)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_LOADED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_FAILED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLICK)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLOSE)
 
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_MEDIUM_PAYMENT_USER)
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_LARGE_PAYMENT_USER)
+
+LUA_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_NORMAL)
+LUA_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_MEDIUM)
+LUA_TGSDK_EVENT_GETTER(TGSDK_BANNER_TYPE_LARGE)
 
 #ifdef __cplusplus
 static int tolua_collect_TGSDK (lua_State* tolua_S) {
@@ -644,6 +711,39 @@ static int tolua_TGSDK_function_parameterFromAdScene(lua_State* tolua_S) {
     return 1;
 }
 
+static int tolua_TGSDK_function_setBannerConfig(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.setBannerConfig called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err) &&
+        tolua_isstring(tolua_S, 2, 0, &tolua_err) &&
+        tolua_isnumber(tolua_S, 3, 0, &tolua_err) &&
+        tolua_isnumber(tolua_S, 4, 0, &tolua_err) &&
+        tolua_isnumber(tolua_S, 5, 0, &tolua_err) &&
+        tolua_isnumber(tolua_S, 6, 0, &tolua_err) &&
+        tolua_isnumber(tolua_S, 7, 0, &tolua_err) ) {
+
+        std::string scene;
+        std::string type;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "setBannerConfig");
+        ok &= __luaval_to_std_string(tolua_S, 2, &type, "setBannerConfig");
+        lua_Number x, y, width, height, interval;
+        x = tolua_tonumber(tolua_S, 3, -1);
+        y = tolua_tonumber(tolua_S, 4, -1);
+        width = tolua_tonumber(tolua_S, 5, 0);
+        height = tolua_tonumber(tolua_S, 6, 0);
+        interval = tolua_tonumber(tolua_S, 7, 0);
+
+        if (ok) {
+            TGSDKCocos2dxHelper::setBannerConfig(scene, type, (float)x, (float)y, (float)width, (float)height, (int)interval);
+        }
+
+    } else {
+        LOGD("Lua TGSDK.setBannerConfig: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.setBannerConfig'.",&tolua_err);
+    }
+    return 0;
+}
+
 static int tolua_TGSDK_function_initialize(lua_State* tolua_S) {
     LOGD("Lua TGSDK.initialize called");
     tolua_Error tolua_err;
@@ -715,6 +815,22 @@ static int tolua_TGSDK_function_showAd(lua_State* tolua_S) {
     } else {
         LOGD("Lua TGSDK.showAd: Wrong number of arguments");
         tolua_error(tolua_S,"#ferror in function 'TGSDK.showAd'.",&tolua_err);
+    }
+    return 0;
+}
+
+static int tolua_TGSDK_function_closeBanner(lua_State* tolua_S) {
+    LOGD("Lua TGSDK.closeBanner called");
+    tolua_Error tolua_err;
+    if (tolua_isstring(tolua_S, 1, 0, &tolua_err)) {
+        std::string scene;
+        bool ok = __luaval_to_std_string(tolua_S, 1, &scene, "closeBanner");
+        if (ok) {
+            TGSDKCocos2dxHelper::closeBanner(scene);
+        }
+    } else {
+        LOGD("Lua TGSDK.closeBanner: Wrong number of arguments");
+        tolua_error(tolua_S,"#ferror in function 'TGSDK.closeBanner'.",&tolua_err);
     }
     return 0;
 }
@@ -901,10 +1017,17 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_LOADED", tolua_TGSDK_EVENT_BANNER_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_FAILED", tolua_TGSDK_EVENT_BANNER_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_CLICK", tolua_TGSDK_EVENT_BANNER_CLICK, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_CLOSE", tolua_TGSDK_EVENT_BANNER_CLOSE, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_NON_PAYING_USER", tolua_TGPAYINGUSER_NON_PAYING_USER, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_SMALL_PAYMENT_USER", tolua_TGPAYINGUSER_SMALL_PAYMENT_USER, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_MEDIUM_PAYMENT_USER", tolua_TGPAYINGUSER_MEDIUM_PAYMENT_USER, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_LARGE_PAYMENT_USER", tolua_TGPAYINGUSER_LARGE_PAYMENT_USER, nullptr);
+        tolua_variable(tolua_S, "TGSDK_BANNER_TYPE_NORMAL", tolua_TGSDK_BANNER_TYPE_NORMAL, nullptr);
+        tolua_variable(tolua_S, "TGSDK_BANNER_TYPE_MEDIUM", tolua_TGSDK_BANNER_TYPE_MEDIUM, nullptr);
+        tolua_variable(tolua_S, "TGSDK_BANNER_TYPE_LARGE", tolua_TGSDK_BANNER_TYPE_LARGE, nullptr);
         tolua_function(tolua_S, "setSDKConfig", tolua_TGSDK_function_setSDKConfig);
         tolua_function(tolua_S, "getSDKConfig", tolua_TGSDK_function_getSDKConfig);
         tolua_function(tolua_S, "setDebugModel", tolua_TGSDK_function_setDebugModel);
@@ -912,9 +1035,11 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_function(tolua_S, "isWIFI", tolua_TGSDK_function_isWIFI);
         tolua_function(tolua_S, "preload", tolua_TGSDK_function_preload);
         tolua_function(tolua_S, "parameterFromAdScene", tolua_TGSDK_function_parameterFromAdScene);
+        tolua_function(tolua_S, "setBannerConfig", tolua_TGSDK_function_setBannerConfig);
         tolua_function(tolua_S, "couldShowAd", tolua_TGSDK_function_couldShowAd);
         tolua_function(tolua_S, "showAd", tolua_TGSDK_function_showAd);
         tolua_function(tolua_S, "showTestView", tolua_TGSDK_function_showTestView);
+        tolua_function(tolua_S, "closeBanner", tolua_TGSDK_function_closeBanner);
         tolua_function(tolua_S, "reportAdRejected", tolua_TGSDK_function_reportAdRejected);
         tolua_function(tolua_S, "showAdScene", tolua_TGSDK_function_showAdScene);
         tolua_function(tolua_S, "sendCounter", tolua_TGSDK_function_sendCounter);
@@ -940,7 +1065,7 @@ extern "C" {
     }
 }
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
-@interface TGSDKCocos2dxHelperiOSDelegate : NSObject<TGPreloadADDelegate, TGADDelegate, TGRewardVideoADDelegate>
+@interface TGSDKCocos2dxHelperiOSDelegate : NSObject<TGPreloadADDelegate, TGADDelegate, TGRewardVideoADDelegate, TGBannerADDelegate>
 @end
 @implementation TGSDKCocos2dxHelperiOSDelegate
 
@@ -995,6 +1120,26 @@ extern "C" {
 
 - (void) onADAwardFailed:(NSString* _Nonnull)result WithError:(NSError* _Nullable)error {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_REWARD_FAILED, (error?[[error description] UTF8String]:""));
+}
+
+- (void) onBanner:(NSString* _Nonnull)scene Loaded:(NSString* _Nonnull)result {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_LOADED, [msg UTF8String]);
+}
+
+- (void) onBanner:(NSString* _Nonnull)scene Failed:(NSString* _Nonnull)result WithError:(NSError* _Nullable)error {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@|%@", scene, result, (error?[error description]:@"")];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_FAILED, [msg UTF8String]);
+}
+
+- (void) onBanner:(NSString* _Nonnull)scene Click:(NSString* _Nonnull)result {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_CLICK, [msg UTF8String]);
+}
+
+- (void) onBanner:(NSString* _Nonnull)scene Close:(NSString* _Nonnull)result {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_CLOSE, [msg UTF8String]);
 }
 
 @end
@@ -1223,6 +1368,7 @@ void TGSDKCocos2dxHelper::preload() {
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK setADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK setRewardVideoADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
+    [TGSDK setBannerDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK preloadAd:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
 #endif
 }
@@ -1343,6 +1489,54 @@ std::string TGSDKCocos2dxHelper::getStringParameterFromAdScene(const std::string
 #endif
 }
 
+void TGSDKCocos2dxHelper::setBannerConfig(const std::string scene, const std::string type, float x, float y, float width, float height, int interval) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKCocos2dxHelper,
+                                                 "setBannerConfig",
+                                                 "(Ljava/lang/String;Ljava/lang/String;FFFFI)V"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        jstring jtype = minfo.env->NewStringUTF(type.c_str());
+        jboolean jret = minfo.env->CallStaticBooleanMethod(
+                                                           minfo.classID,
+                                                           minfo.methodID,
+                                                           jscene, jtype, x, y, width, height, interval);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(jtype);
+        minfo.env->DeleteLocalRef(minfo.classID);
+        LOGD("TGSDKCocos2dxHelper setBannerConfig(%s, %s, %f, %f, %f, %f, %d)", scene.c_str(), type.c_str(), x, y, width, height, interval);
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni setBannerConfig( scene, type, x, y, w, h, i ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    TGBannerType bannerType;
+    if (type.compare(TGSDK_BANNER_TYPE_NORMAL) == 0) {
+        bannerType = TGBannerNormal;
+    } else if (type.compare(TGSDK_BANNER_TYPE_LARGE) == 0) {
+        bannerType = TGBannerLarge;
+    } else if (type.compare(TGSDK_BANNER_TYPE_MEDIUM) == 0) {
+        bannerType = TGBannerMediumRectangle;
+    } else {
+        bannerType = TGBannerNormal;
+    }
+    float sWidth = cocos2d::Director::getInstance()->getOpenGLView()->getFrameSize().width;
+    LOGD("TGSDKCocos2dxHelper setBannerConfig screen width = %f", sWidth);
+    CGFloat __TGSDK_screenScaleFactor = (sWidth / [[UIScreen mainScreen] bounds].size.width);
+    LOGD("TGSDKCocos2dxHelper setBannerConfig scale factor = %f", __TGSDK_screenScaleFactor);
+    x /= __TGSDK_screenScaleFactor;
+    y /= __TGSDK_screenScaleFactor;
+    width /= __TGSDK_screenScaleFactor;
+    height /= __TGSDK_screenScaleFactor;
+    [TGSDK setBanner:[NSString stringWithUTF8String:scene.c_str()] Config:bannerType
+                   x:x y:y width:width height:height Interval:interval];
+    LOGD("TGSDKCocos2dxHelper setBannerConfig(%s, %s, %f, %f, %f, %f, %d)", scene.c_str(), type.c_str(), x, y, width, height, interval);
+#endif
+}
+
 bool TGSDKCocos2dxHelper::couldShowAd(const std::string scene) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     JniMethodInfo minfo;
@@ -1418,6 +1612,31 @@ void TGSDKCocos2dxHelper::showTestView(const std::string scene) {
     }
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK showTestView:[NSString stringWithUTF8String:scene.c_str()]];
+#endif
+}
+
+void TGSDKCocos2dxHelper::closeBanner(const std::string scene) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    JniMethodInfo minfo;
+    bool isHave = JniHelper::getStaticMethodInfo(
+                                                 minfo,
+                                                 JTGSDKCocos2dxHelper,
+                                                 "closeBanner",
+                                                 "(Ljava/lang/String;)V"
+    );
+    if (isHave) {
+        jstring jscene = minfo.env->NewStringUTF(scene.c_str());
+        minfo.env->CallStaticVoidMethod(
+                                        minfo.classID,
+                                        minfo.methodID,
+                                        jscene);
+        minfo.env->DeleteLocalRef(jscene);
+        minfo.env->DeleteLocalRef(minfo.classID);
+    } else {
+        LOGD("TGSDKCocos2dxHelper jni closeBanner( scene ) not found");
+    }
+#elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    [TGSDK closeBanner:[NSString stringWithUTF8String:scene.c_str()]];
 #endif
 }
 
@@ -1679,6 +1898,7 @@ static TGSDKCocos2dxSDKDelegate* __tgsdk_sdk_delegate = NULL;
 static TGSDKCocos2dxPreloadDelegate* __tgsdk_preload_delegate = NULL;
 static TGSDKCocos2dxADDelegate* __tgsdk_ad_delegate = NULL;
 static TGSDKCocos2dxRewardDelegate* __tgsdk_reward_delegate = NULL;
+static TGSDKCocos2dxBannerDelegate* __tgsdk_banner_delegate = NULL;
 void TGSDKCocos2dxHelper::setSDKDelegate(TGSDKCocos2dxSDKDelegate *delegate) {
     __tgsdk_sdk_delegate = delegate;
 }
@@ -1690,6 +1910,9 @@ void TGSDKCocos2dxHelper::setADDelegate(TGSDKCocos2dxADDelegate *delegate) {
 }
 void TGSDKCocos2dxHelper::setRewardDelegate(TGSDKCocos2dxRewardDelegate *delegate) {
     __tgsdk_reward_delegate = delegate;
+}
+void TGSDKCocos2dxHelper::setBannerDelegate(TGSDKCocos2dxBannerDelegate *delegate) {
+    __tgsdk_banner_delegate = delegate;
 }
 #endif
 
@@ -1748,6 +1971,36 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         if (__tgsdk_reward_delegate) {
             __tgsdk_reward_delegate->onADAwardFailed(result);
         }
+    } else if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0) {
+        if (__tgsdk_banner_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            __tgsdk_banner_delegate->onBannerLoaded(scene, ret);
+        }
+    } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+        if (__tgsdk_banner_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret);
+            std::string err = result.substr(fret+1);
+            __tgsdk_banner_delegate->onBannerFailed(scene, ret, err);
+        }
+    } else if (event.compare(TGSDK_EVENT_BANNER_CLICK) == 0) {
+        if (__tgsdk_banner_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            __tgsdk_banner_delegate->onBannerClick(scene, ret);
+        }
+    } else if (event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0) {
+        if (__tgsdk_banner_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            __tgsdk_banner_delegate->onBannerClose(scene, ret);
+        }
     }
 #else
     cocos2d::EventCustom customEvent(event);
@@ -1758,11 +2011,36 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
 #ifdef TGSDK_BIND_JS
     Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
         JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
-        jsval v[] = { std_string_to_jsval(cx, result) };
         std::string cb = event;
         cb.replace(0, 6, "");
         LOGD("Event listener TGSDK.%s ( %s ) called", cb.c_str(), result.c_str());
-        ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), 1, v);
+        int call_argc = 1;
+        if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 || 
+            event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 || 
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            call_argc = 2;
+
+            jsval v[] = { std_string_to_jsval(cx, scene), std_string_to_jsval(cx, ret) };
+            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret);
+            std::string err = result.substr(fret+1);
+            call_argc = 3;
+
+            jsval v[] = { std_string_to_jsval(cx, scene), std_string_to_jsval(cx, ret), std_string_to_jsval(cx, err) };
+            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        } else {
+            jsval v[] = { std_string_to_jsval(cx, result) };
+            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        }
     });
 #endif
 #ifdef TGSDK_BIND_LUA
@@ -1775,8 +2053,35 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         lua_getglobal(L, "yomob");
         lua_getfield(L, -1, "TGSDK");
         lua_getfield(L, -1, cb.c_str());
-        lua_pushstring(L, result.c_str());
-        int error = lua_pcall(L, 1, 0, 0);
+        int call_argc = 1;
+        if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 || 
+            event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 || 
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            call_argc = 2;
+
+            lua_pushstring(L, scene.c_str());
+            lua_pushstring(L, ret.c_str());
+
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret);
+            std::string err = result.substr(fret+1);
+            call_argc = 3;
+
+            lua_pushstring(L, scene.c_str());
+            lua_pushstring(L, ret.c_str());
+            lua_pushstring(L, err.c_str());
+        } else {
+            lua_pushstring(L, result.c_str());
+        }
+        int error = lua_pcall(L, call_argc, 0, 0);
         if (error) {
             LOGD("Lua TGSDK.%s Error: %s", cb.c_str(), lua_tostring(L, -1));
             lua_pop(L, 1);

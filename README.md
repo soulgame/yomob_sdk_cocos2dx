@@ -1,5 +1,8 @@
 # Yomob SDK for Cocos2d-x
 
+>**【注意】由于 `1.8.1` 版本新增了 Banner 广告支持，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.8.1 版本或是使用 Tag 为 1.8.1 之前的 Cocos2d-x 封装代码来兼容以前的版本**
+
+
 >**【注意】由于 `1.8.x` 版本新增了 GDPR 相关合规接口，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.8.x 版本或是使用 Tag 为 1.8.0 之前的 Cocos2d-x 封装代码来兼容以前的版本**
 
 >**【注意】由于 `1.7.x` 版本新增了付费用户追踪接口，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.7.x 版本或是使用 Tag 为 1.7.0 之前的 Cocos2d-x 封装代码来兼容以前的版本**
@@ -220,6 +223,86 @@ if yomob.TGSDK.couldShowAd("Scene ID") then
     yomob.TGSDK.showAd("Scene ID")
 end
 ```
+
+### 播放 Banner 广告
+
+**C++**
+
+```
+yomob::TGSDKCocos2dxHelper::setBannerConfig(
+    "Scene ID",
+    "TGBannerNormal",
+    x, y,
+    width, height,
+    interval
+);
+```
+
+**JavaScript**
+
+```
+yomob.TGSDK.setBannerConfig(
+    "Scene ID",
+    "TGBannerNormal",
+    x, y,
+    width, height,
+    interval
+);
+```
+
+**Lua**
+
+```
+yomob.TGSDK.setBannerConfig(
+    "Scene ID",
+    "TGBannerNormal",
+    x, y,
+    width, height,
+    interval
+)
+```
+
+
+参数解释：
+
+- scene Banner 广告对应注册的广告场景 ID
+
+- type Banner 广告尺寸类型， 其中分为三种类型：
+
+|Banner类型对应字符串|Banner尺寸|
+|:-:|:-|
+|TGBannerNormal|300*50|
+|TGBannerLarge|300*90|
+|TGBannerMediumRectangle|300*250|
+
+- x、y  Banner 放置的位置对应的 X 坐标和 Y 坐标，单位：px
+
+- width、height Banner 广告预留展示位置的宽高，单位：px
+
+- interval Banner 广告轮播切换广告内容的间隔时间，单位：秒
+
+坐标以屏幕左上角为零点，interval为轮播时间，以秒为单位，建议在30-120范围内。需要时还可以关闭Banner广告：
+
+**C++**
+
+```
+yomob::TGSDKCocos2dxHelper::closeBanner("Scene ID");
+```
+
+**JavaScript**
+
+```
+yomob.TGSDK.closeBanner("Scene ID");
+```
+
+**Lua**
+
+```
+yomob.TGSDK.closeBanner("Scene ID")
+```
+
+> **[注意]** 当不需要展示 Banner 广告或者展示 Banner 广告的视图被关闭销毁时，请一定调用 `closeBanner("Scene ID")` 方法手动关闭 Banner 广告，否则会影响下一次的 Banner 广告正常展示。
+
 
 ### 显示广告测试工具（1.6.5 以上）
 
@@ -499,6 +582,15 @@ yomob.TGSDK.reportAdRejected("Scene ID")
 // 广告奖励条件未达成
 #define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
 
+// Banner 广告成功展示
+#define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"
+// Banner 广告展示失败
+#define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"
+// Banner 广告被点击
+#define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"
+// Banner 广告被关闭
+#define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"
+
 ```
 
 **JavaScript & Lua**
@@ -533,6 +625,15 @@ yomob.TGSDK.TGSDK_EVENT_AD_CLOSE
 yomob.TGSDK.TGSDK_EVENT_REWARD_SUCCESS
 // 广告奖励条件未达成
 yomob.TGSDK.TGSDK_EVENT_REWARD_FAILED 
+
+// Banner 广告成功展示
+yomob.TGSDK.TGSDK_EVENT_BANNER_LOADED
+// Banner 广告展示失败
+yomob.TGSDK.TGSDK_EVENT_BANNER_FAILED
+// Banner 广告被点击
+yomob.TGSDK.TGSDK_EVENT_BANNER_CLICK
+// Banner 广告被关闭
+yomob.TGSDK.TGSDK_EVENT_BANNER_CLOSE
 
 ```
 
@@ -620,6 +721,30 @@ EventListenerCustom* sdkListener = NULL;
         CCLOG("Cocos2dx TGSDK Reward Failed : %s", ret);
     });
     Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_BANNER_LOADED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Banner loaded : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_BANNER_FAILED, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Banner failed : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_BANNER_CLICK, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Banner click : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
+    
+    sdkListener = EventListenerCustom::create(TGSDK_EVENT_BANNER_CLOSE, [](EventCustom* evt){
+        const char * ret = (const char*)evt->getUserData();
+        CCLOG("Cocos2dx TGSDK Banner close : %s", ret);
+    });
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(sdkListener, 1);
 ```
 
 **JavaScript**
@@ -676,6 +801,22 @@ yomob.TGSDK.prototype.onADAwardSuccess = function(ret) {
 yomob.TGSDK.prototype.onADAwardFailed = function(ret) {
     cc.log("广告奖励条件未达成，不予奖励");
 };
+
+yomob.TGSDK.prototype.onBannerLoaded = function(scene, ret) {
+    cc.log("Banner 广告成功播放");
+};
+
+yomob.TGSDK.prototype.onBannerFailed = function(scene, ret, err) {
+    cc.log("Banner 广告展示失败");
+};
+
+yomob.TGSDK.prototype.onBannerClick = function(scene, ret) {
+    cc.log("Banner 广告被点击");
+};
+
+yomob.TGSDK.prototype.onBannerClose = function(scene, ret) {
+    cc.log("Banner 广告关闭");
+};
 ```
 
 **Lua**
@@ -731,5 +872,21 @@ end
 
 yomob.TGSDK.onADAwardFailed = function(ret)
     print("广告奖励条件未达成，不予奖励")
+end
+
+yomob.TGSDK.onBannerLoaded = function(scene, ret)
+    print("Banner 广告成功播放")
+end
+
+yomob.TGSDK.onBannerFailed = function(scene, ret, err)
+    print("Banner 广告展示失败")
+end
+
+yomob.TGSDK.onBannerClick = function(scene, ret)
+    print("Banner 广告被点击")
+end
+
+yomob.TGSDK.onBannerClose = function(scene, ret)
+    print("Banner 广告关闭")
 end
 ```
