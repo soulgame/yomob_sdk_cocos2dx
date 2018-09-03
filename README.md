@@ -23,7 +23,7 @@
 
 > **【注意】如果是针对 Android 进行编译时需要将 `TGSDKCocos2dxHelper.mm` 文件重命名为 `TGSDKCocos2dxHelper.cpp` 否则编译时无法正常识别源代码文件**
 
-如果你使用的是 `JavaScript` 脚本，那么需要加入宏 `TGSDK_BIND_JS`，
+如果你使用的是 `JavaScript` 脚本，那么需要加入宏 `TGSDK_BIND_JS`（对于使用 Cocos Creator 生成的项目，需要使用不同的宏，要用`TGSDK_BIND_COCOS_CREATOR`），
 
  如果你使用的是 `Lua` 脚本，那么需要加入宏 `TGSDK_BIND_LUA` 具体做法如下：
 
@@ -63,6 +63,10 @@ endif
 ##添加宏
 APP_CPPFLAGS += -DTGSDK_BIND_JS
 ```
+
+### 对于 Cocos Creator 支持
+
+> **对于 Cocos Creator 支持**，Cocos Creator 对于 JS 的处理和 Cocos2dx-js 不太一样，所以封装的代码也不能共用。因此需要将宏配置为 `TGSDK_BIND_COCOS_CREATOR` 才可以支持 Cocos Creator 的 JavaScript 封装。
 
 如果你要构建 Android 工程，并且你使用的 Yomob 广告 SDK 的版本是 **1.4.3(含)** 以前的版本，那么你还需要将 `java` 文件夹下的文件放入你的项目 `proj.android/src` 文件夹下
 
@@ -750,70 +754,120 @@ EventListenerCustom* sdkListener = NULL;
 **JavaScript**
 
 ```
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK. __proto__.onInitSuccess = function(ret) {
 yomob.TGSDK.prototype.onInitSuccess = function(ret) {
     cc.log("SDK 初始化完成");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onInitFailed = function(ret) {
 yomob.TGSDK.prototype.onInitFailed = function(ret) {
     cc.log("SDK 初始化失败");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onPreloadSuccess = function(ret) {
 yomob.TGSDK.prototype.onPreloadSuccess = function(ret) {
     cc.log("广告预加载成功");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onPreloadFailed = function(ret) {
 yomob.TGSDK.prototype.onPreloadFailed = function(ret) {
     cc.log("广告预加载失败");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onCPADLoaded = function(ret) {
 yomob.TGSDK.prototype.onCPADLoaded = function(ret) {
     cc.log("静态广告资源下载完成");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onVideoADLoaded = function(ret) {
 yomob.TGSDK.prototype.onVideoADLoaded = function(ret) {
     cc.log("视频广告资源下载完成");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onShowSuccess = function(ret) {
 yomob.TGSDK.prototype.onShowSuccess = function(ret) {
     cc.log("广告显示成功");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onShowFailed = function(ret){
 yomob.TGSDK.prototype.onShowFailed = function(ret){
     cc.log("广告显示失败");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onADComplete = function(ret) {
 yomob.TGSDK.prototype.onADComplete = function(ret) {
     cc.log("广告播放完成");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onADClick = function(ret) {
 yomob.TGSDK.prototype.onADClick = function(ret) {
     cc.log("广告被点击了");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onADClose = function(ret) {
 yomob.TGSDK.prototype.onADClose = function(ret) {
     cc.log("广告被关闭了");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onADAwardSuccess = function(ret) {
 yomob.TGSDK.prototype.onADAwardSuccess = function(ret) {
     cc.log("广告奖励条件达成");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onADAwardFailed = function(ret) {
 yomob.TGSDK.prototype.onADAwardFailed = function(ret) {
     cc.log("广告奖励条件未达成，不予奖励");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onBannerLoaded = function(scene, ret) {
 yomob.TGSDK.prototype.onBannerLoaded = function(scene, ret) {
     cc.log("Banner 广告成功播放");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onBannerFailed = function(scene, ret, err) {
 yomob.TGSDK.prototype.onBannerFailed = function(scene, ret, err) {
     cc.log("Banner 广告展示失败");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onBannerClick = function(scene, ret) {
 yomob.TGSDK.prototype.onBannerClick = function(scene, ret) {
     cc.log("Banner 广告被点击");
 };
 
+
+// Cocos Creator 构建的项目请使用 __proto__
+// yomob.TGSDK.__proto__.onBannerClose = function(scene, ret) {
 yomob.TGSDK.prototype.onBannerClose = function(scene, ret) {
     cc.log("Banner 广告关闭");
 };

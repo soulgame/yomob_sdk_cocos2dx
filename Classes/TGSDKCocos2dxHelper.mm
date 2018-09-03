@@ -43,6 +43,539 @@ std::string __tgsdk_jstring_to_stdstring(JNIEnv* env, jstring srcjStr) {
 #define LOGD(...) NSLog(@__VA_ARGS__)
 #endif
 
+#ifdef TGSDK_BIND_COCOS_CREATOR
+#include "cocos/scripting/js-bindings/jswrapper/SeApi.h"
+#include "scripting/js-bindings/auto/jsb_cocos2dx_auto.hpp"
+#include "scripting/js-bindings/manual/jsb_conversions.hpp"
+#include "scripting/js-bindings/manual/jsb_global.h"
+#include "cocos/scripting/js-bindings/event/EventDispatcher.h"
+#include "platform/CCApplication.h"
+#include "base/CCScheduler.h"
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+#include "platform/ios/CCEAGLView-ios.h"
+#endif
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#endif
+
+se::Class *jsb_TGSDK_class = nullptr;
+se::Object *jsb_TGSDK_prototype = nullptr;
+
+#define JSB_TGSDK_EVENT_PROP(evt) \
+static bool jsb_##evt(se::State& s) {\
+    s.rval().setString(#evt); \
+    return true; \
+}\
+SE_BIND_PROP_GET(jsb_##evt)
+
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INIT_SUCCESS)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INIT_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_PRELOAD_SUCCESS)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_PRELOAD_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_CPAD_LOADED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_VIDEOAD_LOADED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_SHOW_SUCCESS)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_SHOW_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_COMPLETE)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_CLICK)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_CLOSE)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_REWARD_SUCCESS)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_REWARD_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_LOADED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_CLICK)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_CLOSE)
+
+JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_NON_PAYING_USER)
+JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_SMALL_PAYMENT_USER)
+JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_MEDIUM_PAYMENT_USER)
+JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_LARGE_PAYMENT_USER)
+
+JSB_TGSDK_EVENT_PROP(TGSDK_BANNER_TYPE_NORMAL)
+JSB_TGSDK_EVENT_PROP(TGSDK_BANNER_TYPE_MEDIUM)
+JSB_TGSDK_EVENT_PROP(TGSDK_BANNER_TYPE_LARGE)
+
+static bool jsb_TGSDK_function_setDebugModel(se::State& s) {
+    LOGD("JSB TGSDK.setDebugModel called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        bool arg0;
+        ok &= seval_to_boolean(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setDebugModel: Error processing arguments");
+        TGSDKCocos2dxHelper::setDebugModel(arg0);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.setDebugModel: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_setDebugModel)
+
+
+static bool jsb_TGSDK_function_initialize(se::State& s) {
+    LOGD("JSB TGSDK.initialize called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        TGSDKCocos2dxHelper::initialize();
+        return true;
+    } else if (1 == argc) {
+        std::string appid;
+        ok &= seval_to_std_string(args[0], &appid);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.initialize: Error processing arguments");
+        TGSDKCocos2dxHelper::initialize(appid);
+        return true;
+    } else if ( 2 <= argc) {
+        std::string appid, channelid;
+        ok &= seval_to_std_string(args[0], &appid);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.initialize: Error processing arguments");
+        ok &= seval_to_std_string(args[1], &channelid);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.initialize: Error processing arguments");
+        TGSDKCocos2dxHelper::initialize(appid, channelid);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.initialize: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_initialize)
+
+static bool jsb_TGSDK_function_setSDKConfig(se::State& s) {
+    LOGD("JSB TGSDK.setSDKConfig called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 2) {
+        std::string key, val;
+        ok &= seval_to_std_string(args[0], &key);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setSDKConfig: Error processing arguments");
+        ok &= seval_to_std_string(args[1], &val);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setSDKConfig: Error processing arguments");
+        TGSDKCocos2dxHelper::setSDKConfig(key, val);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.setSDKConfig: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_setSDKConfig)
+
+
+static bool jsb_TGSDK_function_getSDKConfig(se::State& s) {
+    LOGD("JSB TGSDK.getSDKConfig called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string key, val;
+        ok &= seval_to_std_string(args[0], &key);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.getSDKConfig: Error processing arguments");
+        val = TGSDKCocos2dxHelper::getSDKConfig(key);
+        ok &= std_string_to_seval(val, &s.rval());
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.getSDKConfig: Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.getSDKConfig: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_getSDKConfig)
+
+
+static bool jsb_TGSDK_function_isWIFI(se::State& s) {
+    LOGD("JSB TGSDK.isWIFI called");
+    CC_UNUSED bool ok = true;
+    int ret = TGSDKCocos2dxHelper::isWIFI();
+    ok &= int32_to_seval(ret, &s.rval());
+    SE_PRECONDITION2(ok, false, "JSB TGSDK.isWIFI: Error processing arguments");
+    return true;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_isWIFI)
+
+
+static bool jsb_TGSDK_function_preload(se::State& s) {
+    LOGD("JSB TGSDK.preload called");
+    TGSDKCocos2dxHelper::preload();
+    return true;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_preload)
+
+
+static bool jsb_TGSDK_function_parameterFromAdScene(se::State& s) {
+    LOGD("JSB TGSDK.parameterFromAdScene called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc >= 2) {
+        std::string scene, key;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.parameterFromAdScene: Error processing arguments");
+        ok &= seval_to_std_string(args[1], &key);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.parameterFromAdScene: Error processing arguments");
+        std::string val = TGSDKCocos2dxHelper::getStringParameterFromAdScene(scene, key);
+        if (val.compare(TGSDK_NONE) == 0) {
+            if (argc > 2) {
+                std::string def;
+                ok &= seval_to_std_string(args[2], &def);
+                SE_PRECONDITION2(ok, false, "JSB TGSDK.parameterFromAdScene: Error processing arguments");
+                std_string_to_seval(def, &s.rval());
+            }
+        }
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.parameterFromAdScene: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_parameterFromAdScene)
+
+
+static bool jsb_TGSDK_function_setBannerConfig(se::State& s) {
+    LOGD("JSB TGSDK.setBannerConfig called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 7) {
+        std::string scene, type;
+        double x, y, width, height;
+        long interval;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_std_string(args[1], &type);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_double(args[2], &x);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_double(args[3], &y);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_double(args[4], &width);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_double(args[5], &height);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        ok &= seval_to_long(args[6], &interval);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setBannerConfig: Error processing arguments");
+        TGSDKCocos2dxHelper::setBannerConfig(scene, type, (float)x, (float)y, (float)width, (float)height, (int)interval);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.setBannerConfig: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_setBannerConfig)
+
+
+static bool jsb_TGSDK_function_couldShowAd(se::State& s) {
+    LOGD("JSB TGSDK.couldShowAd called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.couldShowAd: Error processing arguments");
+        bool ret = TGSDKCocos2dxHelper::couldShowAd(scene);
+        ok &= boolean_to_seval(ret, &s.rval());
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.couldShowAd: Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.couldShowAd: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_couldShowAd)
+
+
+static bool jsb_TGSDK_function_showAd(se::State& s) {
+    LOGD("JSB TGSDK.showAd called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.showAd: Error processing arguments");
+        TGSDKCocos2dxHelper::showAd(scene);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.showAd: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_showAd)
+
+
+static bool jsb_TGSDK_function_showTestView(se::State& s) {
+    LOGD("JSB TGSDK.showTestView called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.showTestView: Error processing arguments");
+        TGSDKCocos2dxHelper::showAd(scene);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.showTestView: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_showTestView)
+
+
+static bool jsb_TGSDK_function_closeBanner(se::State& s) {
+    LOGD("JSB TGSDK.closeBanner called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.closeBanner: Error processing arguments");
+        TGSDKCocos2dxHelper::closeBanner(scene);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.closeBanner: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_closeBanner)
+
+
+static bool jsb_TGSDK_function_reportAdRejected(se::State& s) {
+    LOGD("JSB TGSDK.reportAdRejected called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.reportAdRejected: Error processing arguments");
+        TGSDKCocos2dxHelper::reportAdRejected(scene);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.reportAdRejected: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_reportAdRejected)
+
+
+static bool jsb_TGSDK_function_showAdScene(se::State& s) {
+    LOGD("JSB TGSDK.showAdScene called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string scene;
+        ok &= seval_to_std_string(args[0], &scene);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.showAdScene: Error processing arguments");
+        TGSDKCocos2dxHelper::showAdScene(scene);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.showAdScene: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_showAdScene)
+
+
+static bool jsb_TGSDK_function_sendCounter(se::State& s) {
+    LOGD("JSB TGSDK.sendCounter called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 2) {
+        std::string counterid, metadata;
+        ok &= seval_to_std_string(args[0], &counterid);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.sendCounter: Error processing arguments");
+        ok &= seval_to_std_string(args[1], &metadata);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.sendCounter: Error processing arguments");
+        TGSDKCocos2dxHelper::sendCounter(counterid, metadata);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.sendCounter: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_sendCounter)
+
+
+static bool jsb_TGSDK_function_tagPayingUser(se::State& s) {
+    LOGD("JSB TGSDK.tagPayingUser called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    std::string payingUser;
+    std::string currency = "";
+    float currentAmount = 0;
+    float totalAmount = 0;
+    if (1 <= argc) {
+        ok &= seval_to_std_string(args[0], &payingUser);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.tagPayingUser: Error processing arguments");
+        if (!ok) {
+            return false;
+        }
+    }
+    if (2 <= argc) {
+        ok &= seval_to_std_string(args[1], &currency);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.tagPayingUser: Error processing arguments");
+        if (!ok) {
+            currency = "";
+        }
+    }
+    if (3 <= argc) {
+        ok &= seval_to_float(args[2], &currentAmount);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.tagPayingUser: Error processing arguments");
+        if (!ok) {
+            currentAmount = 0.0;
+        }
+    }
+    if (4 <= argc) {
+        ok &= seval_to_float(args[3], &totalAmount);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.tagPayingUser: Error processing arguments");
+        if (!ok) {
+            totalAmount = 0.0;
+        }
+    }
+    if (payingUser.compare(TGPAYINGUSER_NON_PAYING_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxNonPayingUser,
+                                           currency, currentAmount, totalAmount);
+        return true;
+    } else if (payingUser.compare(TGPAYINGUSER_SMALL_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxSmallPaymentUser,
+                                           currency, currentAmount, totalAmount);
+        return true;
+    } else if (payingUser.compare(TGPAYINGUSER_MEDIUM_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxMediumPaymentUser,
+                                           currency, currentAmount, totalAmount);
+        return true;
+    } else if (payingUser.compare(TGPAYINGUSER_LARGE_PAYMENT_USER) == 0) {
+        TGSDKCocos2dxHelper::tagPayingUser(TGSDKCocos2dxLargePaymentUser,
+                                           currency, currentAmount, totalAmount);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.tagPayingUser: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_tagPayingUser)
+
+
+static bool jsb_TGSDK_function_getUserGDPRConsentStatus(se::State& s) {
+    LOGD("JSB TGSDK.getUserGDPRConsentStatus called");
+    std::string ret = TGSDKCocos2dxHelper::getUserGDPRConsentStatus();
+    CC_UNUSED bool ok = std_string_to_seval(ret, &s.rval());
+    SE_PRECONDITION2(ok, false, "JSB TGSDK.tagPayingUser: Error processing arguments");
+    return true;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_getUserGDPRConsentStatus)
+
+
+static bool jsb_TGSDK_function_setUserGDPRConsentStatus(se::State& s) {
+    LOGD("JSB TGSDK.setUserGDPRConsentStatus called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string status;
+        ok &= seval_to_std_string(args[0], &status);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setUserGDPRConsentStatus: Error processing arguments");
+        TGSDKCocos2dxHelper::setUserGDPRConsentStatus(status);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.setUserGDPRConsentStatus: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_setUserGDPRConsentStatus)
+
+
+static bool jsb_TGSDK_function_getIsAgeRestrictedUser(se::State& s) {
+    LOGD("JSB TGSDK.getIsAgeRestrictedUser called");
+    std::string ret = TGSDKCocos2dxHelper::getIsAgeRestrictedUser();
+    CC_UNUSED bool ok = std_string_to_seval(ret, &s.rval());
+    SE_PRECONDITION2(ok, false, "JSB TGSDK.getIsAgeRestrictedUser: Error processing arguments");
+    return true;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_getIsAgeRestrictedUser)
+
+
+static bool jsb_TGSDK_function_setIsAgeRestrictedUser(se::State& s) {
+    LOGD("JSB TGSDK.setIsAgeRestrictedUser called");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string status;
+        ok &= seval_to_std_string(args[0], &status);
+        SE_PRECONDITION2(ok, false, "JSB TGSDK.setIsAgeRestrictedUser: Error processing arguments");
+        TGSDKCocos2dxHelper::setIsAgeRestrictedUser(status);
+        return true;
+    }
+    SE_REPORT_ERROR("JSB TGSDK.setIsAgeRestrictedUser: Wrong number of arguments");
+    return false;
+}
+SE_BIND_FUNC(jsb_TGSDK_function_setIsAgeRestrictedUser)
+
+#define DEFINE_JSB_FUNCTION(method) cls->defineStaticFunction(#method, _SE(jsb_TGSDK_function_##method))
+#define DEFINE_JSB_PROP(prop)  cls->defineStaticProperty(#prop, _SE(jsb_##prop), nullptr)
+bool register_jsb_tgsdk(se::Object* obj)
+{
+    // Get the ns
+    se::Value nsVal;
+    if (!obj->getProperty("yomob", &nsVal))
+    {
+        se::HandleObject jsobj(se::Object::createPlainObject());
+        nsVal.setObject(jsobj);
+        obj->setProperty("yomob", nsVal);
+    }
+    se::Object* ns = nsVal.toObject();
+    
+    auto cls = se::Class::create("TGSDK", ns, nullptr, nullptr);
+    DEFINE_JSB_FUNCTION(setDebugModel);
+    DEFINE_JSB_FUNCTION(setSDKConfig);
+    DEFINE_JSB_FUNCTION(getSDKConfig);
+    DEFINE_JSB_FUNCTION(initialize);
+    DEFINE_JSB_FUNCTION(isWIFI);
+    DEFINE_JSB_FUNCTION(preload);
+    DEFINE_JSB_FUNCTION(parameterFromAdScene);
+    DEFINE_JSB_FUNCTION(setBannerConfig);
+    DEFINE_JSB_FUNCTION(couldShowAd);
+    DEFINE_JSB_FUNCTION(showAd);
+    DEFINE_JSB_FUNCTION(showTestView);
+    DEFINE_JSB_FUNCTION(closeBanner);
+    DEFINE_JSB_FUNCTION(reportAdRejected);
+    DEFINE_JSB_FUNCTION(showAdScene);
+    DEFINE_JSB_FUNCTION(sendCounter);
+    DEFINE_JSB_FUNCTION(tagPayingUser);
+    DEFINE_JSB_FUNCTION(getUserGDPRConsentStatus);
+    DEFINE_JSB_FUNCTION(setUserGDPRConsentStatus);
+    DEFINE_JSB_FUNCTION(getIsAgeRestrictedUser);
+    DEFINE_JSB_FUNCTION(setIsAgeRestrictedUser);
+    
+    DEFINE_JSB_PROP(TGSDK_EVENT_INIT_SUCCESS);
+    DEFINE_JSB_PROP(TGSDK_EVENT_INIT_FAILED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_PRELOAD_SUCCESS);
+    DEFINE_JSB_PROP(TGSDK_EVENT_PRELOAD_FAILED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_CPAD_LOADED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_VIDEOAD_LOADED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_AD_SHOW_SUCCESS);
+    DEFINE_JSB_PROP(TGSDK_EVENT_AD_SHOW_FAILED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_AD_COMPLETE);
+    DEFINE_JSB_PROP(TGSDK_EVENT_AD_CLICK);
+    DEFINE_JSB_PROP(TGSDK_EVENT_AD_CLOSE);
+    DEFINE_JSB_PROP(TGSDK_EVENT_REWARD_SUCCESS);
+    DEFINE_JSB_PROP(TGSDK_EVENT_REWARD_FAILED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_LOADED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_FAILED);
+    DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_CLICK);
+    DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_CLOSE);
+    DEFINE_JSB_PROP(TGPAYINGUSER_NON_PAYING_USER);
+    DEFINE_JSB_PROP(TGPAYINGUSER_SMALL_PAYMENT_USER);
+    DEFINE_JSB_PROP(TGPAYINGUSER_MEDIUM_PAYMENT_USER);
+    DEFINE_JSB_PROP(TGPAYINGUSER_LARGE_PAYMENT_USER);
+    DEFINE_JSB_PROP(TGSDK_BANNER_TYPE_NORMAL);
+    DEFINE_JSB_PROP(TGSDK_BANNER_TYPE_MEDIUM);
+    DEFINE_JSB_PROP(TGSDK_BANNER_TYPE_LARGE);
+    
+    cls->install();
+    JSBClassType::registerClass<yomob::TGSDKCocos2dxHelper>(cls);
+    jsb_TGSDK_prototype = cls->getProto();
+    jsb_TGSDK_class = cls;
+    se::ScriptEngine::getInstance()->clearException();
+    
+    return true;
+}
+
+#endif
+
 #ifdef TGSDK_BIND_JS
 #include "jsapi.h"
 #include "jsfriendapi.h"
@@ -105,7 +638,7 @@ bool jsb_TGSDK_function_setDebugModel(JSContext* cx, uint32_t argc, jsval *vp) {
         args.rval().set(JSVAL_NULL);
         return true;
     }
-    JS_ReportError(cx, "JSB TGSDK.showAd: Wrong number of arguments");
+    JS_ReportError(cx, "JSB TGSDK.setDebugModel: Wrong number of arguments");
     return false;
 }
 
@@ -1523,10 +2056,14 @@ void TGSDKCocos2dxHelper::setBannerConfig(const std::string scene, const std::st
     } else {
         bannerType = TGBannerNormal;
     }
+#ifdef TGSDK_BIND_COCOS_CREATOR
+    CGFloat __TGSDK_screenScaleFactor = 1.0;
+#else
     float sWidth = cocos2d::Director::getInstance()->getOpenGLView()->getFrameSize().width;
     LOGD("TGSDKCocos2dxHelper setBannerConfig screen width = %f", sWidth);
     CGFloat __TGSDK_screenScaleFactor = (sWidth / [[UIScreen mainScreen] bounds].size.width);
     LOGD("TGSDKCocos2dxHelper setBannerConfig scale factor = %f", __TGSDK_screenScaleFactor);
+#endif
     x /= __TGSDK_screenScaleFactor;
     y /= __TGSDK_screenScaleFactor;
     width /= __TGSDK_screenScaleFactor;
@@ -2003,17 +2540,68 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         }
     }
 #else
+#ifdef TGSDK_BIND_COCOS_CREATOR
+    CustomEvent customEvent;
+    customEvent.name = event;
+    EventDispatcher::dispatchCustomEvent(customEvent);
+    cocos2d::Application::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
+        std::string cb = event;
+        cb.replace(0, 6, "");
+        LOGD("Event listener TGSDK.%s ( %s ) will be called", cb.c_str(), result.c_str());
+        se::ValueArray args;
+        se::Value callback;
+        bool ok = true;
+        bool found = jsb_TGSDK_class->getProto()->getProperty(cb.c_str(), &callback);
+        if (!found) {
+            LOGD("Callback Function yomob.TGSDK.__proto__.%s ( %s ) not found...", cb.c_str(), result.c_str());
+            return;
+        }
+        if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 ||
+            event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 ||
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+            
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            
+            args.resize(2);
+            ok &= std_string_to_seval(scene, &args[0]);
+            ok &= std_string_to_seval(ret, &args[1]);
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+            
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret);
+            std::string err = result.substr(fret+1);
+            
+            args.resize(3);
+            ok &= std_string_to_seval(scene, &args[0]);
+            ok &= std_string_to_seval(ret, &args[1]);
+            ok &= std_string_to_seval(err, &args[2]);
+        } else {
+            args.resize(1);
+            ok &= std_string_to_seval(result, &args[0]);
+        }
+        if (ok) {
+            callback.toObject()->call(args, callback.toObject());
+        } else {
+            SE_PRECONDITION2_VOID(ok, "JSB TGSDK.%s ( %s ): Error processing arguments", cb.c_str(), result.c_str());
+        }
+    });
+#else
     cocos2d::EventCustom customEvent(event);
     customEvent.setUserData((void*) result.c_str());
     auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
     dispatcher->dispatchEvent(&customEvent);
+#endif
 #endif
 #ifdef TGSDK_BIND_JS
     Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, event, result]{
         JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
         std::string cb = event;
         cb.replace(0, 6, "");
-        LOGD("Event listener TGSDK.%s ( %s ) called", cb.c_str(), result.c_str());
+        LOGD("Event listener TGSDK.%s ( %s ) will be called", cb.c_str(), result.c_str());
         int call_argc = 1;
         if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 || 
             event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 || 
@@ -2099,5 +2687,9 @@ void TGSDKCocos2dxHelper::bindScript() {
     auto engine = LuaEngine::getInstance();
     lua_State* L = engine->getLuaStack()->getLuaState();
     tolua_tgsdk_open(L);
+#endif
+#ifdef TGSDK_BIND_COCOS_CREATOR
+    se::ScriptEngine* se = se::ScriptEngine::getInstance();
+    se->addRegisterCallback(register_jsb_tgsdk);
 #endif
 }
