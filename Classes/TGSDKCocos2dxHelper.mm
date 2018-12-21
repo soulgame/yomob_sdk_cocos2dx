@@ -2556,6 +2556,7 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             LOGD("Callback Function yomob.TGSDK.__proto__.%s ( %s ) not found...", cb.c_str(), result.c_str());
             return;
         }
+        se::AutoHandleScope hs;
         if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 ||
             event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 ||
             event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
