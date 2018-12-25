@@ -18,6 +18,7 @@ using namespace yomob;
 #include <android/log.h>
 #define  LOG_TAG    "TGSDK"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #define  JTGSDKCocos2dxHelper "com/soulgame/sgsdk/tgsdklib/cocos2dx/TGSDKCocos2dxHelper"
 #define  JTGSDKClass "com/soulgame/sgsdk/tgsdklib/TGSDK"
 
@@ -41,6 +42,7 @@ std::string __tgsdk_jstring_to_stdstring(JNIEnv* env, jstring srcjStr) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
 #include "TGSDK.h"
 #define LOGD(...) NSLog(@__VA_ARGS__)
+#define LOGE(...) NSLog(@__VA_ARGS__)
 #endif
 
 #ifdef TGSDK_BIND_COCOS_CREATOR
@@ -71,19 +73,47 @@ JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INIT_SUCCESS)
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INIT_FAILED)
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_PRELOAD_SUCCESS)
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_PRELOAD_FAILED)
+
+
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_CPAD_LOADED)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_VIDEOAD_LOADED)
+
+
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AWARD_VIDEO_LOADED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INTERSTITIAL_LOADED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED)
+
+
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_SHOW_SUCCESS)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_SHOW_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_COMPLETE)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_CLICK)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_AD_CLOSE)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_REWARD_SUCCESS)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_REWARD_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_LOADED)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_CLICK)
+// Deprecated
 JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_BANNER_CLOSE)
+
+
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_ON_AD_SHOW_SUCCESS)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_ON_AD_SHOW_FAILED)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_ON_AD_CLICK)
+JSB_TGSDK_EVENT_PROP(TGSDK_EVENT_ON_AD_CLOSE)
 
 JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_NON_PAYING_USER)
 JSB_TGSDK_EVENT_PROP(TGPAYINGUSER_SMALL_PAYMENT_USER)
@@ -544,19 +574,44 @@ bool register_jsb_tgsdk(se::Object* obj)
     DEFINE_JSB_PROP(TGSDK_EVENT_INIT_FAILED);
     DEFINE_JSB_PROP(TGSDK_EVENT_PRELOAD_SUCCESS);
     DEFINE_JSB_PROP(TGSDK_EVENT_PRELOAD_FAILED);
+
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_CPAD_LOADED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_VIDEOAD_LOADED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_AD_SHOW_SUCCESS);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_AD_SHOW_FAILED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_AD_COMPLETE);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_AD_CLICK);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_AD_CLOSE);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_REWARD_SUCCESS);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_REWARD_FAILED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_LOADED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_FAILED);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_CLICK);
+    // Deprecated
     DEFINE_JSB_PROP(TGSDK_EVENT_BANNER_CLOSE);
+
+
+    DEFINE_JSB_PROP(TGSDK_EVENT_AWARD_VIDEO_LOADED)
+    DEFINE_JSB_PROP(TGSDK_EVENT_INTERSTITIAL_LOADED)
+    DEFINE_JSB_PROP(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED)
+
+    DEFINE_JSB_PROP(TGSDK_EVENT_ON_AD_SHOW_SUCCESS)
+    DEFINE_JSB_PROP(TGSDK_EVENT_ON_AD_SHOW_FAILED)
+    DEFINE_JSB_PROP(TGSDK_EVENT_ON_AD_CLICK)
+    DEFINE_JSB_PROP(TGSDK_EVENT_ON_AD_CLOSE)
+
     DEFINE_JSB_PROP(TGPAYINGUSER_NON_PAYING_USER);
     DEFINE_JSB_PROP(TGPAYINGUSER_SMALL_PAYMENT_USER);
     DEFINE_JSB_PROP(TGPAYINGUSER_MEDIUM_PAYMENT_USER);
@@ -597,19 +652,44 @@ JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_INIT_SUCCESS)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_INIT_FAILED)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_PRELOAD_SUCCESS)
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_PRELOAD_FAILED)
+
+
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_CPAD_LOADED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_VIDEOAD_LOADED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_SHOW_SUCCESS)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_SHOW_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_COMPLETE)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLICK)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_LOADED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_FAILED)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLICK)
+// Deprecated
 JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLOSE)
+
+
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_AWARD_VIDEO_LOADED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_INTERSTITIAL_LOADED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_SHOW_SUCCESS)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_SHOW_FAILED)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_CLICK)
+JSB_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_CLOSE)
+
 
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
 JSB_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
@@ -1032,19 +1112,45 @@ void register_jsb_tgsdk(JSContext* cx, JS::HandleObject global) {
         JS_PSG("TGSDK_EVENT_INIT_FAILED", jsb_TGSDK_EVENT_INIT_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_PRELOAD_SUCCESS", jsb_TGSDK_EVENT_PRELOAD_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGSDK_EVENT_PRELOAD_FAILED", jsb_TGSDK_EVENT_PRELOAD_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+
+
+        // Deprecated
         JS_PSG("TGSDK_EVENT_CPAD_LOADED", jsb_TGSDK_EVENT_CPAD_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_VIDEOAD_LOADED", jsb_TGSDK_EVENT_VIDEOAD_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_AD_SHOW_SUCCESS", jsb_TGSDK_EVENT_AD_SHOW_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_AD_SHOW_FAILED", jsb_TGSDK_EVENT_AD_SHOW_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_AD_COMPLETE", jsb_TGSDK_EVENT_AD_COMPLETE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_AD_CLICK", jsb_TGSDK_EVENT_AD_CLICK, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_AD_CLOSE", jsb_TGSDK_EVENT_AD_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_REWARD_SUCCESS", jsb_TGSDK_EVENT_REWARD_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_REWARD_FAILED", jsb_TGSDK_EVENT_REWARD_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_BANNER_LOADED", jsb_TGSDK_EVENT_BANNER_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_BANNER_FAILED", jsb_TGSDK_EVENT_BANNER_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_BANNER_CLICK", jsb_TGSDK_EVENT_BANNER_CLICK, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        // Deprecated
         JS_PSG("TGSDK_EVENT_BANNER_CLOSE", jsb_TGSDK_EVENT_BANNER_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+
+
+        JS_PSG("TGSDK_EVENT_AWARD_VIDEO_LOADED", jsb_TGSDK_EVENT_AWARD_VIDEO_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_INTERSTITIAL_LOADED", jsb_TGSDK_EVENT_INTERSTITIAL_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED", jsb_TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_ON_AD_SHOW_SUCCESS", jsb_TGSDK_EVENT_ON_AD_SHOW_SUCCESS, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_ON_AD_SHOW_FAILED", jsb_TGSDK_EVENT_ON_AD_SHOW_FAILED, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_ON_AD_CLICK", jsb_TGSDK_EVENT_ON_AD_CLICK, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        JS_PSG("TGSDK_EVENT_ON_AD_CLOSE", jsb_TGSDK_EVENT_ON_AD_CLOSE, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+
+
         JS_PSG("TGPAYINGUSER_NON_PAYING_USER", jsb_TGPAYINGUSER_NON_PAYING_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_SMALL_PAYMENT_USER", jsb_TGPAYINGUSER_SMALL_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PSG("TGPAYINGUSER_MEDIUM_PAYMENT_USER", jsb_TGPAYINGUSER_MEDIUM_PAYMENT_USER, JSPROP_PERMANENT | JSPROP_ENUMERATE),
@@ -1090,19 +1196,44 @@ LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_INIT_SUCCESS)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_INIT_FAILED)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_PRELOAD_SUCCESS)
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_PRELOAD_FAILED)
+
+
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_CPAD_LOADED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_VIDEOAD_LOADED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_SHOW_SUCCESS)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_SHOW_FAILED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_COMPLETE)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLICK)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AD_CLOSE)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_SUCCESS)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_REWARD_FAILED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_LOADED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_FAILED)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLICK)
+// Deprecated
 LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_BANNER_CLOSE)
+
+
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_AWARD_VIDEO_LOADED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_INTERSTITIAL_LOADED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_SHOW_SUCCESS)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_SHOW_FAILED)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_CLICK)
+LUA_TGSDK_EVENT_GETTER(TGSDK_EVENT_ON_AD_CLOSE)
+
 
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_NON_PAYING_USER)
 LUA_TGSDK_EVENT_GETTER(TGPAYINGUSER_SMALL_PAYMENT_USER)
@@ -1541,19 +1672,45 @@ TOLUA_API int tolua_tgsdk_open(lua_State* tolua_S){
         tolua_variable(tolua_S, "TGSDK_EVENT_INIT_FAILED", tolua_TGSDK_EVENT_INIT_FAILED, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_PRELOAD_SUCCESS", tolua_TGSDK_EVENT_PRELOAD_SUCCESS, nullptr);
         tolua_variable(tolua_S, "TGSDK_EVENT_PRELOAD_FAILED", tolua_TGSDK_EVENT_PRELOAD_FAILED, nullptr);
+
+
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_CPAD_LOADED", tolua_TGSDK_EVENT_CPAD_LOADED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_VIDEOAD_LOADED", tolua_TGSDK_EVENT_VIDEOAD_LOADED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_AD_SHOW_SUCCESS, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_SHOW_FAILED", tolua_TGSDK_EVENT_AD_SHOW_FAILED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_COMPLETE", tolua_TGSDK_EVENT_AD_COMPLETE, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLICK", tolua_TGSDK_EVENT_AD_CLICK, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_AD_CLOSE", tolua_TGSDK_EVENT_AD_CLOSE, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_SUCCESS", tolua_TGSDK_EVENT_REWARD_SUCCESS, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_REWARD_FAILED", tolua_TGSDK_EVENT_REWARD_FAILED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_LOADED", tolua_TGSDK_EVENT_BANNER_LOADED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_FAILED", tolua_TGSDK_EVENT_BANNER_FAILED, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_CLICK", tolua_TGSDK_EVENT_BANNER_CLICK, nullptr);
+        // Deprecated
         tolua_variable(tolua_S, "TGSDK_EVENT_BANNER_CLOSE", tolua_TGSDK_EVENT_BANNER_CLOSE, nullptr);
+
+
+        tolua_variable(tolua_S, "TGSDK_EVENT_AWARD_VIDEO_LOADED", tolua_TGSDK_EVENT_AWARD_VIDEO_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_INTERSTITIAL_LOADED", tolua_TGSDK_EVENT_INTERSTITIAL_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED", tolua_TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_ON_AD_SHOW_SUCCESS", tolua_TGSDK_EVENT_ON_AD_SHOW_SUCCESS, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_ON_AD_SHOW_FAILED", tolua_TGSDK_EVENT_ON_AD_SHOW_FAILED, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_ON_AD_CLICK", tolua_TGSDK_EVENT_ON_AD_CLICK, nullptr);
+        tolua_variable(tolua_S, "TGSDK_EVENT_ON_AD_CLOSE", tolua_TGSDK_EVENT_ON_AD_CLOSE, nullptr);
+
+
         tolua_variable(tolua_S, "TGPAYINGUSER_NON_PAYING_USER", tolua_TGPAYINGUSER_NON_PAYING_USER, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_SMALL_PAYMENT_USER", tolua_TGPAYINGUSER_SMALL_PAYMENT_USER, nullptr);
         tolua_variable(tolua_S, "TGPAYINGUSER_MEDIUM_PAYMENT_USER", tolua_TGPAYINGUSER_MEDIUM_PAYMENT_USER, nullptr);
@@ -1598,7 +1755,7 @@ extern "C" {
     }
 }
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
-@interface TGSDKCocos2dxHelperiOSDelegate : NSObject<TGPreloadADDelegate, TGADDelegate, TGRewardVideoADDelegate, TGBannerADDelegate>
+@interface TGSDKCocos2dxHelperiOSDelegate : NSObject<TGPreloadADDelegate, TGADDelegate, TGRewardVideoADDelegate/*, TGBannerADDelegate*/>
 @end
 @implementation TGSDKCocos2dxHelperiOSDelegate
 
@@ -1619,57 +1776,102 @@ extern "C" {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_PRELOAD_FAILED, (error?[[error description] UTF8String]:""));
 }
 
+// Deprecated
 - (void) onCPADLoaded:(NSString* _Nonnull) result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_CPAD_LOADED, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onVideoADLoaded:(NSString* _Nonnull) result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_VIDEOAD_LOADED, (result?[result UTF8String]:""));
 }
 
+- (void) onAwardVideoLoaded:(NSString* _Nonnull) result {
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AWARD_VIDEO_LOADED, (result?[result UTF8String]:""));
+}
+
+- (void) onInterstitialLoaded:(NSString* _Nonnull) result {
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_INTERSTITIAL_LOADED, (result?[result UTF8String]:""));
+}
+
+- (void) onInterstitialVideoLoaded:(NSString* _Nonnull) result {
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED, (result?[result UTF8String]:""));
+}
+
+- (void) onShow:(NSString* _Nonnull)scene Success:(NSString* _Nonnull)result {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_ON_AD_SHOW_SUCCESS, [msg UTF8String]);
+}
+
+- (void) onShow:(NSString* _Nonnull)scene Failed:(NSString* _Nonnull)result Error:(NSError* _Nullable)error {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@|%@", scene, result, (error?[error description]:@"")];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_ON_AD_SHOW_FAILED, [msg UTF8String]);
+}
+
+- (void) onAD:(NSString* _Nonnull)scene Click:(NSString* _Nonnull)result {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_ON_AD_CLICK, [msg UTF8String]);
+}
+
+- (void) onAD:(NSString* _Nonnull)scene Close:(NSString* _Nonnull)result Award:(BOOL)award {
+    NSString* msg = [NSString stringWithFormat:@"%@|%@|%@", scene, result, (award?@"yes":@"no")];
+    TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_ON_AD_CLOSE, [msg UTF8String]);
+}
+
+// Deprecated
 - (void) onShowSuccess:(NSString* _Nonnull)result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AD_SHOW_SUCCESS, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onShowFailed:(NSString* _Nonnull)result WithError:(NSError* _Nullable)error {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AD_SHOW_FAILED, (error?[[error description] UTF8String]:""));
 }
 
+// Deprecated
 - (void) onADComplete:(NSString* _Nonnull)result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AD_COMPLETE, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onADClick:(NSString* _Nonnull)result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AD_CLICK, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onADClose:(NSString* _Nonnull)result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_AD_CLOSE, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onADAwardSuccess:(NSString* _Nonnull)result {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_REWARD_SUCCESS, (result?[result UTF8String]:""));
 }
 
+// Deprecated
 - (void) onADAwardFailed:(NSString* _Nonnull)result WithError:(NSError* _Nullable)error {
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_REWARD_FAILED, (error?[[error description] UTF8String]:""));
 }
 
+// Deprecated
 - (void) onBanner:(NSString* _Nonnull)scene Loaded:(NSString* _Nonnull)result {
     NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_LOADED, [msg UTF8String]);
 }
 
+// Deprecated
 - (void) onBanner:(NSString* _Nonnull)scene Failed:(NSString* _Nonnull)result WithError:(NSError* _Nullable)error {
     NSString* msg = [NSString stringWithFormat:@"%@|%@|%@", scene, result, (error?[error description]:@"")];
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_FAILED, [msg UTF8String]);
 }
 
+// Deprecated
 - (void) onBanner:(NSString* _Nonnull)scene Click:(NSString* _Nonnull)result {
     NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_CLICK, [msg UTF8String]);
 }
 
+// Deprecated
 - (void) onBanner:(NSString* _Nonnull)scene Close:(NSString* _Nonnull)result {
     NSString* msg = [NSString stringWithFormat:@"%@|%@", scene, result];
     TGSDKCocos2dxHelper::handleEvent(TGSDK_EVENT_BANNER_CLOSE, [msg UTF8String]);
@@ -1901,7 +2103,7 @@ void TGSDKCocos2dxHelper::preload() {
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_IOS
     [TGSDK setADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK setRewardVideoADDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
-    [TGSDK setBannerDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
+    // [TGSDK setBannerDelegate:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
     [TGSDK preloadAd:[TGSDKCocos2dxHelperiOSDelegate getInstance]];
 #endif
 }
@@ -2520,7 +2722,7 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
             std::size_t fret = result.find("|", fscene+1);
-            std::string ret = result.substr(fscene+1, fret);
+            std::string ret = result.substr(fscene+1, fret - fscene - 1);
             std::string err = result.substr(fret+1);
             __tgsdk_banner_delegate->onBannerFailed(scene, ret, err);
         }
@@ -2537,6 +2739,50 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             std::string scene = result.substr(0, fscene);
             std::string ret = result.substr(fscene+1);
             __tgsdk_banner_delegate->onBannerClose(scene, ret);
+        }
+    } else if (event.compare(TGSDK_EVENT_AWARD_VIDEO_LOADED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onAwardVideoLoaded(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_INTERSTITIAL_LOADED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onInterstitialLoaded(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED) == 0) {
+        if (__tgsdk_preload_delegate) {
+            __tgsdk_preload_delegate->onInterstitialVideoLoaded(result);
+        }
+    } else if (event.compare(TGSDK_EVENT_ON_AD_SHOW_SUCCESS) == 0) {
+        if (__tgsdk_ad_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            __tgsdk_ad_delegate->onShowSuccess(scene, ret);
+        }
+    } else if (event.compare(TGSDK_EVENT_ON_AD_SHOW_FAILED) == 0) {
+        if (__tgsdk_ad_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
+            std::string err = result.substr(fret+1);
+            __tgsdk_ad_delegate->onShowFailed(scene, ret, err);
+        }
+    } else if (event.compare(TGSDK_EVENT_ON_AD_CLICK) == 0) {
+        if (__tgsdk_ad_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::string ret = result.substr(fscene+1);
+            __tgsdk_ad_delegate->onADClick(scene, ret);
+        }
+    } else if (event.compare(TGSDK_EVENT_ON_AD_CLOSE) == 0) {
+        if (__tgsdk_ad_delegate) {
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
+            std::string award = result.substr(fret+1);
+            __tgsdk_ad_delegate->onADClose(scene, ret, (award.compare("yes")==0));
         }
     }
 #else
@@ -2559,7 +2805,9 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         se::AutoHandleScope hs;
         if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 ||
             event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 ||
-            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_SUCCESS) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_CLICK) == 0) {
             
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
@@ -2568,18 +2816,31 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             args.resize(2);
             ok &= std_string_to_seval(scene, &args[0]);
             ok &= std_string_to_seval(ret, &args[1]);
-        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_FAILED) == 0) {
             
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
             std::size_t fret = result.find("|", fscene+1);
-            std::string ret = result.substr(fscene+1, fret);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
             std::string err = result.substr(fret+1);
             
             args.resize(3);
             ok &= std_string_to_seval(scene, &args[0]);
             ok &= std_string_to_seval(ret, &args[1]);
             ok &= std_string_to_seval(err, &args[2]);
+        } else if (event.compare(TGSDK_EVENT_ON_AD_CLOSE) == 0) {
+            
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
+            std::string award = result.substr(fret+1);
+            
+            args.resize(3);
+            ok &= std_string_to_seval(scene, &args[0]);
+            ok &= std_string_to_seval(ret, &args[1]);
+            ok &= boolean_to_seval((award.compare("yes")==0), &args[2]);
         } else {
             args.resize(1);
             ok &= std_string_to_seval(result, &args[0]);
@@ -2604,9 +2865,12 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         cb.replace(0, 6, "");
         LOGD("Event listener TGSDK.%s ( %s ) will be called", cb.c_str(), result.c_str());
         int call_argc = 1;
+        bool ok = true;
         if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 || 
             event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 || 
-            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_SUCCESS) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_CLICK) == 0) {
 
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
@@ -2614,21 +2878,38 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             call_argc = 2;
 
             jsval v[] = { std_string_to_jsval(cx, scene), std_string_to_jsval(cx, ret) };
-            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
-        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+            ok &= ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_FAILED) == 0) {
 
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
             std::size_t fret = result.find("|", fscene+1);
-            std::string ret = result.substr(fscene+1, fret);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
             std::string err = result.substr(fret+1);
             call_argc = 3;
 
             jsval v[] = { std_string_to_jsval(cx, scene), std_string_to_jsval(cx, ret), std_string_to_jsval(cx, err) };
-            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+            ok &= ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        } else if (event.compare(TGSDK_EVENT_ON_AD_CLOSE) == 0) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
+            std::string award = result.substr(fret+1);
+            call_argc = 3;
+
+            jsval v[] = { std_string_to_jsval(cx, scene), std_string_to_jsval(cx, ret), BOOLEAN_TO_JSVAL((award.compare("yes")==0)) };
+            ok &= ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
         } else {
             jsval v[] = { std_string_to_jsval(cx, result) };
-            ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+            ok &= ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsb_TGSDK_prototype), cb.c_str(), call_argc, v);
+        }
+        if (ok) {
+            LOGD("Event listener TGSDK.%s ( %s ) has been called successful", cb.c_str(), result.c_str());
+        } else {
+            LOGE("Event listener TGSDK.%s ( %s ) has been called failure!!!", cb.c_str(), result.c_str());
         }
     });
 #endif
@@ -2645,7 +2926,9 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
         int call_argc = 1;
         if (event.compare(TGSDK_EVENT_BANNER_LOADED) == 0 || 
             event.compare(TGSDK_EVENT_BANNER_CLICK) == 0 || 
-            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ) {
+            event.compare(TGSDK_EVENT_BANNER_CLOSE) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_SUCCESS) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_CLICK) == 0) {
 
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
@@ -2655,25 +2938,40 @@ void TGSDKCocos2dxHelper::handleEvent(const std::string event, const std::string
             lua_pushstring(L, scene.c_str());
             lua_pushstring(L, ret.c_str());
 
-        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0) {
+        } else if (event.compare(TGSDK_EVENT_BANNER_FAILED) == 0 ||
+            event.compare(TGSDK_EVENT_ON_AD_SHOW_FAILED) == 0) {
 
             std::size_t fscene = result.find("|");
             std::string scene = result.substr(0, fscene);
             std::size_t fret = result.find("|", fscene+1);
-            std::string ret = result.substr(fscene+1, fret);
+            std::string ret = result.substr(fscene+1, fret-fscene-1);
             std::string err = result.substr(fret+1);
             call_argc = 3;
 
             lua_pushstring(L, scene.c_str());
             lua_pushstring(L, ret.c_str());
             lua_pushstring(L, err.c_str());
+        } else if (event.compare(TGSDK_EVENT_ON_AD_CLOSE) == 0) {
+
+            std::size_t fscene = result.find("|");
+            std::string scene = result.substr(0, fscene);
+            std::size_t fret = result.find("|", fscene+1);
+            std::string ret = result.substr(fscene+1, fret - fscene - 1);
+            std::string award = result.substr(fret+1);
+            call_argc = 3;
+
+            lua_pushstring(L, scene.c_str());
+            lua_pushstring(L, ret.c_str());
+            lua_pushboolean(L, (award.compare("yes")==0));
         } else {
             lua_pushstring(L, result.c_str());
         }
         int error = lua_pcall(L, call_argc, 0, 0);
         if (error) {
-            LOGD("Lua TGSDK.%s Error: %s", cb.c_str(), lua_tostring(L, -1));
+            LOGE("Lua TGSDK.%s Error: %s", cb.c_str(), lua_tostring(L, -1));
             lua_pop(L, 1);
+        } else {
+            LOGD("Event listener TGSDK.%s ( %s ) has been called successful", cb.c_str(), result.c_str());
         }
     });
 #endif
