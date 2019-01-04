@@ -1,5 +1,7 @@
 # Yomob SDK for Cocos2d-x
 
+>**【注意】由于 `1.8.3` 版本更改了广告行为事件通知的结构，如果使用以前版本的 TGSDK 接入会无法成功编译，请尽快升级你的 TGSDK 到 1.8.3 版本或使用 Tag 为 1.8.3 之前的 Cocos2d-x 封装代码来兼容以前的版本**
+
 >**【注意】由于 `1.8.1` 版本新增了 Banner 广告支持，如果使用以前版本的 TGSDK 接入会由于缺少新接口的实现导致无法成功编译，请尽快升级你的 TGSDK 到 1.8.1 版本或是使用 Tag 为 1.8.1 之前的 Cocos2d-x 封装代码来兼容以前的版本**
 
 
@@ -565,35 +567,55 @@ yomob.TGSDK.reportAdRejected("Scene ID")
 #define TGSDK_EVENT_PRELOAD_SUCCESS "TGSDK_onPreloadSuccess"
 // 广告预加载失败
 #define TGSDK_EVENT_PRELOAD_FAILED  "TGSDK_onPreloadFailed"
-// 静态广告资源下载完成
-#define TGSDK_EVENT_CPAD_LOADED     "TGSDK_onCPADLoaded"
-// 视频广告资源下载完成
-#define TGSDK_EVENT_VIDEOAD_LOADED  "TGSDK_onVideoADLoaded"
 
-// 广告显示成功
-#define TGSDK_EVENT_AD_SHOW_SUCCESS "TGSDK_onShowSuccess"
-// 广告显示失败
-#define TGSDK_EVENT_AD_SHOW_FAILED  "TGSDK_onShowFailed"
-// 广告播放完成
-#define TGSDK_EVENT_AD_COMPLETE     "TGSDK_onADComplete"
-// 广告被点击
-#define TGSDK_EVENT_AD_CLICK        "TGSDK_onADClick"
-// 广告被关闭
-#define TGSDK_EVENT_AD_CLOSE        "TGSDK_onADClose"
 
-// 广告奖励条件达成
-#define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"
-// 广告奖励条件未达成
-#define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
+// 静态广告资源下载完成【1.8.3 开始作废】
+~~#define TGSDK_EVENT_CPAD_LOADED     "TGSDK_onCPADLoaded"~~
+// 视频广告资源下载完成【1.8.3 开始作废】
+~~#define TGSDK_EVENT_VIDEOAD_LOADED  "TGSDK_onVideoADLoaded"~~
 
-// Banner 广告成功展示
-#define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"
-// Banner 广告展示失败
-#define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"
-// Banner 广告被点击
-#define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"
-// Banner 广告被关闭
-#define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"
+
+// 激励视频广告资源下载完成【1.8.3 新增】
+#define TGSDK_EVENT_AWARD_VIDEO_LOADED "TGSDK_onAwardVideoLoaded"
+// 插屏视频广告资源下载完成1.8.3 新增】
+#define TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED "TGSDK_onInterstitialVideoLoaded"
+// 插屏视频广告资源下载完成1.8.3 新增】
+#define TGSDK_EVENT_INTERSTITIAL_LOADED "TGSDK_onInterstitialLoaded"
+
+// 广告显示成功【1.8.3 开始作废】
+~~#define TGSDK_EVENT_AD_SHOW_SUCCESS "TGSDK_onShowSuccess"~~
+// 广告显示失败【1.8.3 开始作废】
+~~#define TGSDK_EVENT_AD_SHOW_FAILED  "TGSDK_onShowFailed"~~
+// 广告播放完成【1.8.3 开始作废】
+~~#define TGSDK_EVENT_AD_COMPLETE     "TGSDK_onADComplete"~~
+// 广告被点击【1.8.3 开始作废】
+~~#define TGSDK_EVENT_AD_CLICK        "TGSDK_onADClick"~~
+// 广告被关闭【1.8.3 开始作废】
+~~#define TGSDK_EVENT_AD_CLOSE        "TGSDK_onADClose"~~
+
+// 广告奖励条件达成【1.8.3 开始作废】
+~~#define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"~~
+// 广告奖励条件未达成【1.8.3 开始作废】
+~~#define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"~~
+
+// Banner 广告成功展示【1.8.3 开始作废】
+~~#define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"~~
+// Banner 广告展示失败【1.8.3 开始作废】
+~~#define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"~~
+// Banner 广告被点击【1.8.3 开始作废】
+~~#define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"~~
+// Banner 广告被关闭【1.8.3 开始作废】
+~~#define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"~~
+
+
+// 广告显示成功【1.8.3 新增】
+#define TGSDK_EVENT_ON_AD_SHOW_SUCCESS "TGSDK_onADShowSuccess"
+// 广告显示失败【1.8.3 新增】
+#define TGSDK_EVENT_ON_AD_SHOW_FAILED  "TGSDK_onADShowFailed"
+// 广告被点击【1.8.3 新增】
+#define TGSDK_EVENT_ON_AD_CLICK        "TGSDK_onADClicked"
+// 广告被关闭【1.8.3 新增】
+#define TGSDK_EVENT_ON_AD_CLOSE        "TGSDK_onADClosed"
 
 ```
 
@@ -609,35 +631,57 @@ yomob.TGSDK.TGSDK_EVENT_INIT_FAILED
 yomob.TGSDK.TGSDK_EVENT_PRELOAD_SUCCESS
 // 广告预加载失败
 yomob.TGSDK.TGSDK_EVENT_PRELOAD_FAILED 
-// 静态广告资源下载完成
-yomob.TGSDK.TGSDK_EVENT_CPAD_LOADED    
-// 视频广告资源下载完成
-yomob.TGSDK.TGSDK_EVENT_VIDEOAD_LOADED 
 
-// 广告显示成功
-yomob.TGSDK.TGSDK_EVENT_AD_SHOW_SUCCESS
-// 广告显示失败
-yomob.TGSDK.TGSDK_EVENT_AD_SHOW_FAILED 
-// 广告播放完成
-yomob.TGSDK.TGSDK_EVENT_AD_COMPLETE    
-// 广告被点击
-yomob.TGSDK.TGSDK_EVENT_AD_CLICK       
-// 广告被关闭
-yomob.TGSDK.TGSDK_EVENT_AD_CLOSE       
 
-// 广告奖励条件达成
-yomob.TGSDK.TGSDK_EVENT_REWARD_SUCCESS
-// 广告奖励条件未达成
-yomob.TGSDK.TGSDK_EVENT_REWARD_FAILED 
+// 静态广告资源下载完成【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_CPAD_LOADED~~
+// 视频广告资源下载完成【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_VIDEOAD_LOADED~~
 
-// Banner 广告成功展示
-yomob.TGSDK.TGSDK_EVENT_BANNER_LOADED
-// Banner 广告展示失败
-yomob.TGSDK.TGSDK_EVENT_BANNER_FAILED
-// Banner 广告被点击
-yomob.TGSDK.TGSDK_EVENT_BANNER_CLICK
-// Banner 广告被关闭
-yomob.TGSDK.TGSDK_EVENT_BANNER_CLOSE
+
+// 激励视频广告资源下载完成【1.8.3 新增】
+yomob.TGSDK_EVENT_AWARD_VIDEO_LOADED
+// 插屏视频广告资源下载完成1.8.3 新增】
+yomob.TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED
+// 插屏视频广告资源下载完成1.8.3 新增】
+yomob.TGSDK_EVENT_INTERSTITIAL_LOADED
+
+
+// 广告显示成功【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_AD_SHOW_SUCCESS~~
+// 广告显示失败【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_AD_SHOW_FAILED~~
+// 广告播放完成【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_AD_COMPLETE~~
+// 广告被点击【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_AD_CLICK~~
+// 广告被关闭【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_AD_CLOSE~~
+
+// 广告奖励条件达成【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_REWARD_SUCCESS~~
+// 广告奖励条件未达成【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_REWARD_FAILED~~
+
+// Banner 广告成功展示【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_BANNER_LOADED~~
+// Banner 广告展示失败【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_BANNER_FAILED~~
+// Banner 广告被点击【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_BANNER_CLICK~~
+// Banner 广告被关闭【1.8.3 开始作废】
+~~yomob.TGSDK.TGSDK_EVENT_BANNER_CLOSE~~
+
+
+// 广告显示成功【1.8.3 新增】
+yomob.TGSDK_EVENT_ON_AD_SHOW_SUCCESS
+// 广告显示失败【1.8.3 新增】
+yomob.TGSDK_EVENT_ON_AD_SHOW_FAILED
+// 广告被点击【1.8.3 新增】
+yomob.TGSDK_EVENT_ON_AD_CLICK
+// 广告被关闭【1.8.3 新增】
+yomob.TGSDK_EVENT_ON_AD_CLOSE
+
 
 ```
 
@@ -753,7 +797,7 @@ EventListenerCustom* sdkListener = NULL;
 
 **JavaScript**
 
-```
+```javascript
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK. __proto__.onInitSuccess = function(ret) {
 yomob.TGSDK.prototype.onInitSuccess = function(ret) {
@@ -782,100 +826,146 @@ yomob.TGSDK.prototype.onPreloadFailed = function(ret) {
 };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onCPADLoaded = function(ret) {
-yomob.TGSDK.prototype.onCPADLoaded = function(ret) {
-    cc.log("静态广告资源下载完成");
-};
+// yomob.TGSDK.prototype.onCPADLoaded = function(ret) {
+//     cc.log("静态广告资源下载完成");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onVideoADLoaded = function(ret) {
-yomob.TGSDK.prototype.onVideoADLoaded = function(ret) {
-    cc.log("视频广告资源下载完成");
+// yomob.TGSDK.prototype.onVideoADLoaded = function(ret) {
+//     cc.log("视频广告资源下载完成");
+// };
+
+
+yomob.TGSDK.prototype.onAwardVideoLoaded = function(ret) {
+    cc.log("奖励视频广告资源下载完成");
+};
+
+yomob.TGSDK.prototype.onInterstitialVideoLoaded = function(ret) {
+    cc.log("插屏视频广告资源下载完成");
+};
+
+yomob.TGSDK.prototype.onInterstitialLoaded = function(ret){
+    cc.log("静态插屏广告资源下载完成");
 };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onShowSuccess = function(ret) {
-yomob.TGSDK.prototype.onShowSuccess = function(ret) {
-    cc.log("广告显示成功");
-};
+// yomob.TGSDK.prototype.onShowSuccess = function(ret) {
+//     cc.log("广告显示成功");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onShowFailed = function(ret){
-yomob.TGSDK.prototype.onShowFailed = function(ret){
-    cc.log("广告显示失败");
-};
+// yomob.TGSDK.prototype.onShowFailed = function(ret){
+//     cc.log("广告显示失败");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onADComplete = function(ret) {
-yomob.TGSDK.prototype.onADComplete = function(ret) {
-    cc.log("广告播放完成");
-};
+// yomob.TGSDK.prototype.onADComplete = function(ret) {
+//     cc.log("广告播放完成");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onADClick = function(ret) {
-yomob.TGSDK.prototype.onADClick = function(ret) {
-    cc.log("广告被点击了");
-};
+// yomob.TGSDK.prototype.onADClick = function(ret) {
+//     cc.log("广告被点击了");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onADClose = function(ret) {
-yomob.TGSDK.prototype.onADClose = function(ret) {
-    cc.log("广告被关闭了");
-};
+// yomob.TGSDK.prototype.onADClose = function(ret) {
+//     cc.log("广告被关闭了");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onADAwardSuccess = function(ret) {
-yomob.TGSDK.prototype.onADAwardSuccess = function(ret) {
-    cc.log("广告奖励条件达成");
-};
+// yomob.TGSDK.prototype.onADAwardSuccess = function(ret) {
+//     cc.log("广告奖励条件达成");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onADAwardFailed = function(ret) {
-yomob.TGSDK.prototype.onADAwardFailed = function(ret) {
-    cc.log("广告奖励条件未达成，不予奖励");
-};
+// yomob.TGSDK.prototype.onADAwardFailed = function(ret) {
+//     cc.log("广告奖励条件未达成，不予奖励");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onBannerLoaded = function(scene, ret) {
-yomob.TGSDK.prototype.onBannerLoaded = function(scene, ret) {
-    cc.log("Banner 广告成功播放");
-};
+// yomob.TGSDK.prototype.onBannerLoaded = function(scene, ret) {
+//     cc.log("Banner 广告成功播放");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onBannerFailed = function(scene, ret, err) {
-yomob.TGSDK.prototype.onBannerFailed = function(scene, ret, err) {
-    cc.log("Banner 广告展示失败");
-};
+// yomob.TGSDK.prototype.onBannerFailed = function(scene, ret, err) {
+//     cc.log("Banner 广告展示失败");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onBannerClick = function(scene, ret) {
-yomob.TGSDK.prototype.onBannerClick = function(scene, ret) {
-    cc.log("Banner 广告被点击");
-};
+// yomob.TGSDK.prototype.onBannerClick = function(scene, ret) {
+//     cc.log("Banner 广告被点击");
+// };
 
 
+// 【1.8.3 开始作废】
 // Cocos Creator 构建的项目请使用 __proto__
 // yomob.TGSDK.__proto__.onBannerClose = function(scene, ret) {
-yomob.TGSDK.prototype.onBannerClose = function(scene, ret) {
-    cc.log("Banner 广告关闭");
+// yomob.TGSDK.prototype.onBannerClose = function(scene, ret) {
+//     cc.log("Banner 广告关闭");
+// };
+
+yomob.TGSDK.prototype.onADShowSuccess = function(scene, ret) {
+    cc.log("广告展示成功");
+};
+
+yomob.TGSDK.prototype.onADShowFailed = function(scene, ret, err) {
+    cc.log("广告展示失败");
+};
+
+yomob.TGSDK.prototype.onADClicked = function(scene, ret) {
+    cc.log("广告被点击了")
+};
+
+yomob.TGSDK.prototype.onADClosed = function(scene, ret, reward){
+    if (reward) {
+        cc.log("广告关闭，并且可以领取奖励");
+    } else {
+        cc.log("广告关闭，没有达成奖励条件，无法领取奖励");
+    }
 };
 ```
 
 **Lua**
 
-```
+```lua
 yomob.TGSDK.onInitSuccess = function(ret)
     print("SDK 初始化完成")
 end
@@ -892,55 +982,102 @@ yomob.TGSDK.onPreloadFailed = function(ret)
     print("广告预加载失败")
 end
 
-yomob.TGSDK.onCPADLoaded = function(ret)
-    print("静态广告资源下载完成")
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onCPADLoaded = function(ret)
+--     print("静态广告资源下载完成")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onVideoADLoaded = function(ret)
+--     print("视频广告资源下载完成")
+-- end
+
+yomob.TGSDK.onAwardVideoLoaded = function(ret)
+    print("激励视频广告资源加载成功")
 end
 
-yomob.TGSDK.onVideoADLoaded = function(ret)
-    print("视频广告资源下载完成")
+yomob.TGSDK.onInterstitialVideoLoaded = function(ret)
+    print("插屏视频广告资源加载成功")
 end
 
-yomob.TGSDK.onShowSuccess = function(ret)
-    print("广告显示成功")
+yomob.TGSDK.onInterstitialLoaded = function(ret)
+    print("静态插屏广告资源加载成功")
 end
 
-yomob.TGSDK.onShowFailed = function(ret)
-    print("广告显示失败")
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onShowSuccess = function(ret)
+--     print("广告显示成功")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onShowFailed = function(ret)
+--     print("广告显示失败")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onADComplete = function(ret)
+--     print("广告播放完成")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onADClick = function(ret)
+--     print("广告被点击了")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onADClose = function(ret)
+--     print("广告被关闭了")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onADAwardSuccess = function(ret)
+--     print("广告奖励条件达成")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onADAwardFailed = function(ret)
+--     print("广告奖励条件未达成，不予奖励")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onBannerLoaded = function(scene, ret)
+--     print("Banner 广告成功播放")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onBannerFailed = function(scene, ret, err)
+ --    print("Banner 广告展示失败")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onBannerClick = function(scene, ret)
+--     print("Banner 广告被点击")
+-- end
+
+-- 【1.8.3 开始作废】
+-- yomob.TGSDK.onBannerClose = function(scene, ret)
+--     print("Banner 广告关闭")
+-- end
+
+
+yomob.TGSDK.onADShowSuccess = function(scene, ret)
+    print("广告展示成功")
 end
 
-yomob.TGSDK.onADComplete = function(ret)
-    print("广告播放完成")
+yomob.TGSDK.onADShowFailed = function(scene, ret, err)
+    print("广告展示失败")
 end
 
-yomob.TGSDK.onADClick = function(ret)
+yomob.TGSDK.onADClicked = function(scene, ret)
     print("广告被点击了")
 end
 
-yomob.TGSDK.onADClose = function(ret)
-    print("广告被关闭了")
+yomob.TGSDK.onADClosed = function(scene, ret, reward)
+    if (reward) then
+        print("广告关闭，并且可以领取奖励")
+    else
+        print("广告关闭，没有达成奖励条件，无法领取奖励")
+    end
 end
 
-yomob.TGSDK.onADAwardSuccess = function(ret)
-    print("广告奖励条件达成")
-end
-
-yomob.TGSDK.onADAwardFailed = function(ret)
-    print("广告奖励条件未达成，不予奖励")
-end
-
-yomob.TGSDK.onBannerLoaded = function(scene, ret)
-    print("Banner 广告成功播放")
-end
-
-yomob.TGSDK.onBannerFailed = function(scene, ret, err)
-    print("Banner 广告展示失败")
-end
-
-yomob.TGSDK.onBannerClick = function(scene, ret)
-    print("Banner 广告被点击")
-end
-
-yomob.TGSDK.onBannerClose = function(scene, ret)
-    print("Banner 广告关闭")
-end
 ```
