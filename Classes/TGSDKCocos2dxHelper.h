@@ -15,8 +15,8 @@
 
 #define TGSDK_EVENT_PRELOAD_SUCCESS           "TGSDK_onPreloadSuccess"
 #define TGSDK_EVENT_PRELOAD_FAILED            "TGSDK_onPreloadFailed"
-#define TGSDK_EVENT_CPAD_LOADED               "TGSDK_onCPADLoaded"  // Deprecated
-#define TGSDK_EVENT_VIDEOAD_LOADED            "TGSDK_onVideoADLoaded"  // Deprecated
+// #define TGSDK_EVENT_CPAD_LOADED               "TGSDK_onCPADLoaded"  // Deprecated
+// #define TGSDK_EVENT_VIDEOAD_LOADED            "TGSDK_onVideoADLoaded"  // Deprecated
 
 // From 1.8.3
 #define TGSDK_EVENT_AWARD_VIDEO_LOADED        "TGSDK_onAwardVideoLoaded"
@@ -24,15 +24,15 @@
 #define TGSDK_EVENT_INTERSTITIAL_VIDEO_LOADED "TGSDK_onInterstitialVideoLoaded"
 
 // Deprecated
-#define TGSDK_EVENT_AD_SHOW_SUCCESS "TGSDK_onShowSuccess"
+// #define TGSDK_EVENT_AD_SHOW_SUCCESS "TGSDK_onShowSuccess"
 // Deprecated
-#define TGSDK_EVENT_AD_SHOW_FAILED  "TGSDK_onShowFailed"
+// #define TGSDK_EVENT_AD_SHOW_FAILED  "TGSDK_onShowFailed"
 // Deprecated
-#define TGSDK_EVENT_AD_COMPLETE     "TGSDK_onADComplete"
+// #define TGSDK_EVENT_AD_COMPLETE     "TGSDK_onADComplete"
 // Deprecated
-#define TGSDK_EVENT_AD_CLICK        "TGSDK_onADClick"
+// #define TGSDK_EVENT_AD_CLICK        "TGSDK_onADClick"
 // Deprecated
-#define TGSDK_EVENT_AD_CLOSE        "TGSDK_onADClose"
+// #define TGSDK_EVENT_AD_CLOSE        "TGSDK_onADClose"
 
 // From 1.8.3
 #define TGSDK_EVENT_ON_AD_SHOW_SUCCESS "TGSDK_onADShowSuccess"
@@ -40,13 +40,15 @@
 #define TGSDK_EVENT_ON_AD_CLICK        "TGSDK_onADClicked"
 #define TGSDK_EVENT_ON_AD_CLOSE        "TGSDK_onADClosed"
 
-#define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"
-#define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
+// Deprecated
+// #define TGSDK_EVENT_REWARD_SUCCESS "TGSDK_onADAwardSuccess"
+// #define TGSDK_EVENT_REWARD_FAILED  "TGSDK_onADAwardFailed"
 
-#define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"
-#define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"
-#define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"
-#define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"
+// Deprecated
+// #define TGSDK_EVENT_BANNER_LOADED  "TGSDK_onBannerLoaded"
+// #define TGSDK_EVENT_BANNER_FAILED  "TGSDK_onBannerFailed"
+// #define TGSDK_EVENT_BANNER_CLICK   "TGSDK_onBannerClick"
+// #define TGSDK_EVENT_BANNER_CLOSE   "TGSDK_onBannerClose"
 
 #define TGPAYINGUSER_NON_PAYING_USER     "TGSDK_NON_PAYING_USER"
 #define TGPAYINGUSER_SMALL_PAYMENT_USER  "TGSDK_SMALL_PAYMENT_USER"
@@ -77,8 +79,8 @@ namespace yomob {
     public:
         virtual void onPreloadSuccess(const std::string ret){};
         virtual void onPreloadFailed(const std::string ret){};
-        virtual void onCPADLoaded(const std::string ret){};  // Deprecated
-        virtual void onVideoADLoaded(const std::string ret){};  // Deprecated
+        // virtual void onCPADLoaded(const std::string ret){};  // Deprecated
+        // virtual void onVideoADLoaded(const std::string ret){};  // Deprecated
         // From 1.8.3
         virtual void onAwardVideoLoaded(const std::string ret){};
         virtual void onInterstitialLoaded(const std::string ret){};
@@ -87,11 +89,11 @@ namespace yomob {
 
     class TGSDKCocos2dxADDelegate {
     public:
-        virtual void onShowSuccess(const std::string ret){};  // Deprecated
-        virtual void onShowFailed(const std::string ret){};  // Deprecated
-        virtual void onADComplete(const std::string ret){};  // Deprecated
-        virtual void onADClick(const std::string ret){};  // Deprecated
-        virtual void onADClose(const std::string ret){};  // Deprecated
+        // virtual void onShowSuccess(const std::string ret){};  // Deprecated
+        // virtual void onShowFailed(const std::string ret){};  // Deprecated
+        // virtual void onADComplete(const std::string ret){};  // Deprecated
+        // virtual void onADClick(const std::string ret){};  // Deprecated
+        // virtual void onADClose(const std::string ret){};  // Deprecated
         virtual void onShowSuccess(const std::string scene, const std::string ret){};
         virtual void onShowFailed(const std::string scene, const std::string ret, const std:string error){};
         virtual void onADClick(const std::string scene, const std::string ret){};
@@ -99,20 +101,20 @@ namespace yomob {
     };
 
     // Deprecated
-    class TGSDKCocos2dxRewardDelegate {
-    public:
-        virtual void onADAwardSuccess(const std::string ret){};  // Deprecated
-        virtual void onADAwardFailed(const std::string ret){};  // Deprecated
-    };
+    // class TGSDKCocos2dxRewardDelegate {
+    // public:
+    //     virtual void onADAwardSuccess(const std::string ret){};  // Deprecated
+    //     virtual void onADAwardFailed(const std::string ret){};  // Deprecated
+    // };
 
-    // Deprecated
-    class TGSDKCocos2dxBannerDelegate {
-    public:
-        virtual void onBannerLoaded(const std::string scene, const std::string ret){};
-        virtual void onBannerFailed(const std::string scene, const std::string ret const std::string error){};
-        virtual void onBannerClick(const std::string scene, const std::string ret){};
-        virtual void onBannerClose(const std::string scene, const std::string ret){};
-    }
+    // // Deprecated
+    // class TGSDKCocos2dxBannerDelegate {
+    // public:
+    //     virtual void onBannerLoaded(const std::string scene, const std::string ret){};
+    //     virtual void onBannerFailed(const std::string scene, const std::string ret const std::string error){};
+    //     virtual void onBannerClick(const std::string scene, const std::string ret){};
+    //     virtual void onBannerClose(const std::string scene, const std::string ret){};
+    // }
 #endif
     class TGSDKCocos2dxHelper {
     public:
