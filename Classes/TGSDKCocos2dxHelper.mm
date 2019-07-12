@@ -2236,10 +2236,10 @@ void TGSDKCocos2dxHelper::setBannerConfig(const std::string scene, const std::st
     if (isHave) {
         jstring jscene = minfo.env->NewStringUTF(scene.c_str());
         jstring jtype = minfo.env->NewStringUTF(type.c_str());
-        jboolean jret = minfo.env->CallStaticBooleanMethod(
-                                                           minfo.classID,
-                                                           minfo.methodID,
-                                                           jscene, jtype, x, y, width, height, interval);
+        minfo.env->CallStaticVoidMethod(
+                                                 minfo.classID,
+                                                 minfo.methodID,
+                                                 jscene, jtype, x, y, width, height, interval);
         minfo.env->DeleteLocalRef(jscene);
         minfo.env->DeleteLocalRef(jtype);
         minfo.env->DeleteLocalRef(minfo.classID);
